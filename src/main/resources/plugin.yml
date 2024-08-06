@@ -1,0 +1,6 @@
+name: Backpack
+version: '1.0-SNAPSHOT'
+main: top.mores.backpack.Backpack
+api-version: '1.18'
+authors: [Mores]
+description: 背包
