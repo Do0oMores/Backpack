@@ -3,11 +3,23 @@ package top.mores.backpack.Command;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+import top.mores.backpack.GUI.MainGUI;
 
 public class BackpackCommand implements CommandExecutor {
+    MainGUI mainGUI=new MainGUI();
 
     @Override
     public boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings) {
-        return false;
+        if (commandSender instanceof Player){
+            //打开背包
+            if (strings.length==1&&strings[0].equals("open")){
+                Player sender=(Player) commandSender;
+                mainGUI.CreateMainInventory(sender);
+            }
+        }else {
+            commandSender.sendMessage("只有玩家在游戏内可以这样做！");
+        }
+        return true;
     }
 }

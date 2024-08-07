@@ -1,19 +1,24 @@
 package top.mores.backpack.GUI;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import top.mores.backpack.Backpack;
 import top.mores.backpack.Utils.FileUtils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class MainGUI {
     FileUtils fileUtils = new FileUtils();
+    Map<String,Inventory> inventoryMap=new HashMap<>();
 
     /**
      * 构建主背包内的物品
@@ -62,5 +67,17 @@ public class MainGUI {
         }
         // 返回背包列表
         return items;
+    }
+
+    public void CreateMainInventory(Player player) {
+        Inventory MainInventory = Bukkit.createInventory(player, 9, ChatColor.DARK_GREEN + "背包选择");
+        int index = MainInventory.firstEmpty();
+        if (index != -1) {
+            for (ItemStack item : MainInventoryItem(player.getName())) {
+                MainInventory.setItem(MainInventory.firstEmpty(), item);
+            }
+        }
+        inventoryMap.put(player.getName(), MainInventory);
+        player.openInventory(MainInventory);
     }
 }

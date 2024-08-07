@@ -4,3 +4,7 @@ main: top.mores.backpack.Backpack
 api-version: '1.18'
 authors: [Mores]
 description: 背包
+commands:
+  bp:
+    description: Backpack command
+    usage: /bp <open|edit>
