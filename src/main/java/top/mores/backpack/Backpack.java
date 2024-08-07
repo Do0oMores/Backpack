@@ -16,23 +16,38 @@ public final class Backpack extends JavaPlugin {
     public static Backpack instance;
     public static FileConfiguration config;
     public static FileConfiguration data;
-    File configFile;
-    File dataFile;
+    private File configFile;
+    private File dataFile;
 
     @Override
     public void onEnable() {
         instance = this;
-        MainGUI mainGUI=new MainGUI();
+        MainGUI mainGUI = new MainGUI();
         this.getServer().getPluginManager().registerEvents(new PlayerEventListener(mainGUI), this);
         Objects.requireNonNull(getCommand("bp")).setExecutor(new BackpackCommand());
 
         //加载config.yml
-        loadFile("config.yml");
+        configFile = new File(getDataFolder(), "config.yml");
+        if (!configFile.exists()) {
+            boolean isCreateDir = configFile.getParentFile().mkdir();
+            if (!isCreateDir) {
+                getLogger().warning("创建config.yml失败");
+                return;
+            }
+            saveResource("config.yml", false);
+        }
         reloadConfig();
-        //加载data.yml
-        loadFile("data.yml");
-        reloadData();
 
+        dataFile = new File(getDataFolder(), "data.yml");
+        if (!dataFile.exists()) {
+            try {
+                dataFile.createNewFile();
+            } catch (IOException e) {
+                getLogger().warning("创建data.yml失败");
+            }
+        }
+        reloadData();
+        config = getConfig();
         getLogger().info("Enabled!");
     }
 
@@ -43,19 +58,6 @@ public final class Backpack extends JavaPlugin {
 
     public static Backpack getInstance() {
         return instance;
-    }
-
-    private void loadFile(String fileName) {
-        File file = new File(getDataFolder(), fileName);
-        if (!file.exists()) {
-            boolean isCreateDir = file.getParentFile().mkdirs();
-            //添加一个文件夹创建判断
-            if (!isCreateDir) {
-                getLogger().warning("创建" + fileName + "失败");
-                return;
-            }
-            saveResource(fileName, false);
-        }
     }
 
     public void reloadConfig() {
