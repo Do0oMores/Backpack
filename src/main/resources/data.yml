@@ -1,2 +1,16 @@
 PlayerName:
   Backpack1:
+      items:
+        - type: TACZ_MODERN_KINETIC_GUNdis
+          meta:
+            display-name: '{"italic":false,"color":"light_purple","text":"Sks半自动步枪"}'
+            lore:
+              - '{"italic":false,"color":"yellow","extra":[{"color":"red","extra":[{"color":"yellow","text":"◥"}],"text":"半自动步枪"}],"text":"◣"}'
+              - '{"italic":false,"color":"aqua","text":"The Simonov SKS carbine"}'
+              - '{"italic":false,"color":"aqua","text":"于第二次世界大战期间设计"}'
+            Unbreakable: true
+            internal: H4sIAAAAAAAA/6WQTU/DMAyGXcqkKiDGBOJ/IG67bVXZKqhW0e6wXaK0DW3Uj1SJiwS/HlMkKq7bJY6dvI/9mgE4sNgKux6aRmLYrYUxsnE8mG2GLixggSL/WtracrqgykXDYL5CSqpWdpj4uzjw4EIVMB9/ir8nB2a+HigycFGUHlxPMgLf/4Jz3Usucl0S/+kRwIOr6JBuQ5+nhzgAN6ktg9tJGe2Px9fTOj4Io/plJj51J5H/WMoaUcixJ5l9VkZGmvLLJIhCF+6o5g+0jQ5XbatHMgAwBjcTdvMWxqfZH4cp6eC2Uu9oK20I/3+56c5/OYOeDYgWdV7zD9VLQ8N/A+JMtPrvAQAA
+  Backpack2:
+    items:
+  Backpack3:
+    items:

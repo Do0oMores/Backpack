@@ -19,13 +19,16 @@ public final class Backpack extends JavaPlugin {
     @Override
     public void onEnable() {
         instance = this;
+
         this.getServer().getPluginManager().registerEvents(new PlayerEventListener(), this);
+
         //加载config.yml
         loadFile("config.yml");
         reloadConfig();
         //加载data.yml
         loadFile("data.yml");
         reloadData();
+
         getLogger().info("Enabled!");
     }
 
