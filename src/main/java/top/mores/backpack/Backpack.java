@@ -5,6 +5,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 import top.mores.backpack.Command.BackpackCommand;
 import top.mores.backpack.EventListener.PlayerEventListener;
+import top.mores.backpack.GUI.MainGUI;
 
 import java.io.File;
 import java.io.IOException;
@@ -21,8 +22,8 @@ public final class Backpack extends JavaPlugin {
     @Override
     public void onEnable() {
         instance = this;
-
-        this.getServer().getPluginManager().registerEvents(new PlayerEventListener(), this);
+        MainGUI mainGUI=new MainGUI();
+        this.getServer().getPluginManager().registerEvents(new PlayerEventListener(mainGUI), this);
         Objects.requireNonNull(getCommand("bp")).setExecutor(new BackpackCommand());
 
         //加载config.yml

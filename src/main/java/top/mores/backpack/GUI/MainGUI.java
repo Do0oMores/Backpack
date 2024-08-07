@@ -18,10 +18,15 @@ import java.util.Map;
 
 public class MainGUI {
     FileUtils fileUtils = new FileUtils();
-    Map<String,Inventory> inventoryMap=new HashMap<>();
+    public Map<String, Inventory> inventoryMap = new HashMap<>();
+
+    public Map<String, Inventory> getInventoryMap() {
+        return inventoryMap;
+    }
 
     /**
      * 构建主背包内的物品
+     *
      * @param playerName 玩家ID
      * @return 主背包内的物品列表
      */
