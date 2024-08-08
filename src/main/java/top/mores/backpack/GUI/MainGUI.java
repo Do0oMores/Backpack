@@ -9,6 +9,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import top.mores.backpack.Backpack;
+import top.mores.backpack.Utils.ChatColorUtil;
 import top.mores.backpack.Utils.FileUtils;
 
 import java.util.ArrayList;
@@ -47,15 +48,17 @@ public class MainGUI {
                 loreList.add(ChatColor.RED + "该背包为空");
             } else {
                 // 遍历背包中的物品并解析display-name
-                for (Map<?, ?> item : backpackItems) {
-                    if (item.containsKey("meta")) {
-                        Map<?, ?> metaData = (Map<?, ?>) item.get("meta");
-                        if (metaData.containsKey("display-name")) {
-                            String displayName = (String) metaData.get("display-name");
-                            // 将display-name添加到lore
-                            loreList.add(ChatColor.translateAlternateColorCodes('&', displayName));
-                        }
+                for (Map<?, ?> itemData : backpackItems) {
+                    Map<String, Object> metaMap = (Map<String, Object>) itemData.get("meta");
+                    String displayName;
+
+                    if (metaMap != null && metaMap.containsKey("display-name")) {
+                        displayName = ChatColorUtil.parseDisplayName((String) metaMap.get("display-name"));
+                    } else {
+                        displayName = ChatColor.GRAY + "未注册物品";
                     }
+
+                    loreList.add(ChatColor.YELLOW + displayName);
                 }
             }
             // 设置物品的lore
