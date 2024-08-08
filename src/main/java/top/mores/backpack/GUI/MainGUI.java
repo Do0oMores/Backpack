@@ -12,17 +12,11 @@ import top.mores.backpack.Backpack;
 import top.mores.backpack.Utils.FileUtils;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class MainGUI {
     FileUtils fileUtils = new FileUtils();
-    public Map<String, Inventory> inventoryMap = new HashMap<>();
-
-    public Map<String, Inventory> getInventoryMap() {
-        return inventoryMap;
-    }
 
     /**
      * 构建主背包内的物品
@@ -87,7 +81,6 @@ public class MainGUI {
                 MainInventory.setItem(MainInventory.firstEmpty(), item);
             }
         }
-        inventoryMap.put(player.getName(), MainInventory);
         player.openInventory(MainInventory);
     }
 }

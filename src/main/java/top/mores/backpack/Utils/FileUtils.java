@@ -4,6 +4,8 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import top.mores.backpack.Backpack;
 
+import java.util.List;
+
 public class FileUtils {
     FileConfiguration config = Backpack.getInstance().getConfig();
     FileConfiguration data = Backpack.getInstance().getDataConfig();
@@ -27,5 +29,13 @@ public class FileUtils {
             }
         }
         Backpack.getInstance().saveDataFile();
+    }
+
+    private List<String> getEditWorlds(){
+        return config.getStringList("可编辑的世界");
+    }
+
+    public boolean isInCanEditWorlds(String WorldName){
+        return getEditWorlds().contains(WorldName);
     }
 }
