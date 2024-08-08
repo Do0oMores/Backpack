@@ -80,7 +80,7 @@ public class MainGUI {
      * @param player 玩家ID
      */
     public void CreateMainInventory(Player player) {
-        Inventory MainInventory = Bukkit.createInventory(player, 9, ChatColor.DARK_GREEN + "背包选择");
+        Inventory MainInventory = Bukkit.createInventory(player, 9, "§d背包选择");
         int index = MainInventory.firstEmpty();
         if (index != -1) {
             for (ItemStack item : MainInventoryItem(player.getName())) {
