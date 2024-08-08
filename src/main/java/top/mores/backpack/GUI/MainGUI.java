@@ -44,7 +44,7 @@ public class MainGUI {
             // 设置背包的显示名称
             meta.setDisplayName(ChatColor.DARK_AQUA + "背包" + i);
             List<String> loreList = new ArrayList<>();
-            loreList.add("&7&m&e&m-&e&m-&6&m-&6&m-&8&m---------------------&6&m-&6&m-&e&m-&e&m-&7&m&m");
+            loreList.add("§7§m§e§m-§e§m-§6§m-§6§m-§8§m---------------------§6§m-§6§m-§e§m-§e§m-§7§m§m");
             // 读取data.yml文件中的背包数据
             FileConfiguration data = Backpack.getInstance().getDataConfig();
             List<Map<?, ?>> backpackItems = data.getMapList(playerName + ".Backpack" + i + ".items");
@@ -74,6 +74,11 @@ public class MainGUI {
         return items;
     }
 
+    /**
+     * 创建主背包
+     *
+     * @param player 玩家ID
+     */
     public void CreateMainInventory(Player player) {
         Inventory MainInventory = Bukkit.createInventory(player, 9, ChatColor.DARK_GREEN + "背包选择");
         int index = MainInventory.firstEmpty();

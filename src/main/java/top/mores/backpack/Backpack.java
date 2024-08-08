@@ -22,31 +22,14 @@ public final class Backpack extends JavaPlugin {
     @Override
     public void onEnable() {
         instance = this;
+
+        // 初始化 config.yml 和 data.yml
+        initFiles();
+
         MainGUI mainGUI = new MainGUI();
         this.getServer().getPluginManager().registerEvents(new PlayerEventListener(mainGUI), this);
         Objects.requireNonNull(getCommand("bp")).setExecutor(new BackpackCommand());
 
-        //加载config.yml
-        configFile = new File(getDataFolder(), "config.yml");
-        if (!configFile.exists()) {
-            boolean isCreateDir = configFile.getParentFile().mkdir();
-            if (!isCreateDir) {
-                getLogger().warning("创建config.yml失败");
-                return;
-            }
-            saveResource("config.yml", false);
-        }
-        reloadConfig();
-
-        dataFile = new File(getDataFolder(), "data.yml");
-        if (!dataFile.exists()) {
-            try {
-                dataFile.createNewFile();
-            } catch (IOException e) {
-                getLogger().warning("创建data.yml失败");
-            }
-        }
-        reloadData();
         config = getConfig();
         getLogger().info("Enabled!");
     }
@@ -66,6 +49,9 @@ public final class Backpack extends JavaPlugin {
 
     @Override
     public FileConfiguration getConfig() {
+        if (config == null) {
+            reloadConfig();
+        }
         return config;
     }
 
@@ -74,7 +60,7 @@ public final class Backpack extends JavaPlugin {
         try {
             data.save(dataFile);
         } catch (IOException e) {
-            getLogger().severe("保存数据文件出错！");
+            getLogger().severe("保存数据文件出错！" + e.getMessage());
         }
     }
 
@@ -85,6 +71,33 @@ public final class Backpack extends JavaPlugin {
 
     // 获取 data.yml
     public FileConfiguration getDataConfig() {
+        if (data == null) {
+            reloadData();
+        }
         return data;
     }
+
+    private void initFiles() {
+        configFile = new File(getDataFolder(), "config.yml");
+        if (!configFile.exists()) {
+            boolean isCreateDir = configFile.getParentFile().mkdirs();
+            if (!isCreateDir) {
+                getLogger().warning("创建config.yml目录失败");
+                return;
+            }
+            saveResource("config.yml", false);
+        }
+        reloadConfig();
+
+        dataFile = new File(getDataFolder(), "data.yml");
+        if (!dataFile.exists()) {
+            try {
+                dataFile.createNewFile();
+            } catch (IOException e) {
+                getLogger().warning("创建data.yml失败: " + e.getMessage());
+            }
+        }
+        reloadData();
+    }
 }
+

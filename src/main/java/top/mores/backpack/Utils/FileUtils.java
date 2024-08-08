@@ -6,7 +6,7 @@ import top.mores.backpack.Backpack;
 
 public class FileUtils {
     FileConfiguration config = Backpack.getInstance().getConfig();
-    public FileConfiguration data = Backpack.getInstance().getDataConfig();
+    FileConfiguration data = Backpack.getInstance().getDataConfig();
 
     //获取config.yml 背包数量
     public int getBackpackAmount() {
@@ -26,5 +26,6 @@ public class FileUtils {
                 data.set(playerName + ".Backpack" + i + ".items", "");
             }
         }
+        Backpack.getInstance().saveDataFile();
     }
 }
