@@ -27,12 +27,12 @@ public class ChatColorUtil {
             }
 
             //解析加粗
-            if (jsonObject.containsKey("bold")&&(Boolean) jsonObject.get("bold")){
+            if (jsonObject.containsKey("bold") && (Boolean) jsonObject.get("bold")) {
                 displayName.append(ChatColor.BOLD);
             }
 
             //解析下划线
-            if (jsonObject.containsKey("underlined")&&(Boolean) jsonObject.get("underlined")){
+            if (jsonObject.containsKey("underlined") && (Boolean) jsonObject.get("underlined")) {
                 displayName.append(ChatColor.UNDERLINE);
             }
 

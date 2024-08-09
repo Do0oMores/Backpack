@@ -46,10 +46,10 @@ public class PlayerEventListener implements Listener {
             if (fileUtils.isInCanEditWorlds(player.getWorld().getName())) {
                 //判断点的哪个背包
                 int slot = event.getSlot();
-                if (slot >= 0 && slot <= fileUtils.getBackpackAmount()) {
-                    singleBackpack.CreateSingleInventory((Player) player, slot + 1);
-                } else
-                    return;
+                if (fileUtils.isInSyncWorlds(player.getWorld().getName())){
+
+                }
+                singleBackpack.CreateSingleInventory((Player) player, slot + 1);
             } else {
                 player.sendMessage("该世界不可编辑背包！");
             }
