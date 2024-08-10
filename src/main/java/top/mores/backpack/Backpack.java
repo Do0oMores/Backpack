@@ -3,8 +3,9 @@ package top.mores.backpack;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.jetbrains.annotations.NotNull;
 import top.mores.backpack.Command.BackpackCommand;
-import top.mores.backpack.EventListener.PlayerEventListener;
+import top.mores.backpack.EventListener.InventoryEventListener;
 import top.mores.backpack.GUI.MainGUI;
 
 import java.io.File;
@@ -27,7 +28,7 @@ public final class Backpack extends JavaPlugin {
         initFiles();
 
         MainGUI mainGUI = new MainGUI();
-        this.getServer().getPluginManager().registerEvents(new PlayerEventListener(mainGUI), this);
+        this.getServer().getPluginManager().registerEvents(new InventoryEventListener(mainGUI), this);
         Objects.requireNonNull(getCommand("bp")).setExecutor(new BackpackCommand());
 
         config = getConfig();
@@ -48,7 +49,7 @@ public final class Backpack extends JavaPlugin {
     }
 
     @Override
-    public FileConfiguration getConfig() {
+    public @NotNull FileConfiguration getConfig() {
         if (config == null) {
             reloadConfig();
         }

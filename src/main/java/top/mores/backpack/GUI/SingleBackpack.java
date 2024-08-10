@@ -4,6 +4,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import top.mores.backpack.Backpack;
 import top.mores.backpack.Utils.ItemStackUtil;
 
@@ -43,4 +44,35 @@ public class SingleBackpack {
         }
         player.openInventory(singleInventory);
     }
+
+    /**
+     * 检查容器内有多少物品的lore包含字符串
+     *
+     * @param inventory 容器
+     * @param charValue 字符串
+     * @return 数量
+     */
+    public int checkItemLoreContains(Inventory inventory, String charValue) {
+        int amount = 0;
+        ItemStack[] itemList = inventory.getContents();
+
+        for (ItemStack item : itemList) {
+            if (item != null) {
+                ItemMeta itemMeta = item.getItemMeta();
+                if (itemMeta != null && itemMeta.hasLore()) {
+                    List<String> loreList = itemMeta.getLore();
+                    if (loreList != null) {
+                        for (String lore : loreList) {
+                            if (lore.contains(charValue)) {
+                                amount++;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return amount;
+    }
+
 }
