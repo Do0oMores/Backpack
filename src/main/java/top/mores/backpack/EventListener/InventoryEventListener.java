@@ -9,16 +9,14 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
+import org.bukkit.inventory.ItemStack;
 import top.mores.backpack.Backpack;
 import top.mores.backpack.GUI.MainGUI;
 import top.mores.backpack.GUI.SingleBackpack;
 import top.mores.backpack.Utils.FileUtils;
 import top.mores.backpack.Utils.ItemStackUtil;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class InventoryEventListener implements Listener {
@@ -68,10 +66,12 @@ public class InventoryEventListener implements Listener {
                 Inventory inventory = event.getInventory();
                 int MainAmount = singleBackpack.checkItemLoreContains(inventory, "主武器");
                 int SecondAmount = singleBackpack.checkItemLoreContains(inventory, "副武器");
+
+                //提取背包编号
+                String title = inventoryView.getTitle();
+                String backpackNumber = title.substring(title.lastIndexOf("背包") + 2);
+                String path = playerName + ".Backpack" + backpackNumber + ".items";
                 if (MainAmount == 1 && SecondAmount == 1) {
-                    //提取背包编号
-                    String title = inventoryView.getTitle();
-                    String backpackNumber = title.substring(title.lastIndexOf("背包") + 2);
 
                     // 序列化物品
                     List<Map<String, Object>> serializedItems = Arrays.stream(inventory.getContents())
@@ -80,15 +80,24 @@ public class InventoryEventListener implements Listener {
                             .collect(Collectors.toList());
 
                     // 保存到 data.yml
-                    String path = playerName + ".Backpack" + backpackNumber + ".items";
                     Backpack.getInstance().getDataConfig().set(path, serializedItems);
                     Backpack.getInstance().saveDataFile();
 
                     player.sendMessage("背包 " + backpackNumber + " 已保存！");
-                }else {
-                    player.sendMessage("背包保存失败，需要有一把主武器和一把副武器");
+                } else {
+                    for (ItemStack item : inventory.getContents()) {
+                        if (item != null) {
+                            HashMap<Integer, ItemStack> remainingItems = player.getInventory().addItem(item);
+                            for (ItemStack remaining : remainingItems.values()) {
+                                player.getWorld().dropItemNaturally(player.getLocation(), remaining);
+                            }
+                        }
+                    }
+                    inventory.clear();
+                    Backpack.getInstance().getDataConfig().set(path, null);
+                    Backpack.getInstance().saveDataFile();
+                    player.sendMessage("背包保存失败，需要有一把主武器和一把副武器，您的物品已返还");
                 }
-
             } else {
                 player.sendMessage("该世界不可编辑背包！");
             }
