@@ -15,15 +15,14 @@ import java.util.Objects;
 public final class Backpack extends JavaPlugin {
 
     public static Backpack instance;
-    public static FileConfiguration config;
-    public static FileConfiguration data;
+    public FileConfiguration config;
+    public FileConfiguration data;
     private File configFile;
     private File dataFile;
 
     @Override
     public void onEnable() {
         instance = this;
-
         // 初始化 config.yml 和 data.yml
         initFiles();
 
@@ -101,4 +100,3 @@ public final class Backpack extends JavaPlugin {
         reloadData();
     }
 }
-

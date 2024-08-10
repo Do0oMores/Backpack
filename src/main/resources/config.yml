@@ -2,6 +2,6 @@
 背包数量: 3
 可编辑的世界:
   - world
-  - TEST
+  - sync
 同步背包的世界:
-  - TEST
+  - sync

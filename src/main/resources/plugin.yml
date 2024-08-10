@@ -7,4 +7,4 @@ description: 背包
 commands:
   bp:
     description: Backpack command
-    usage: /bp <open|edit>
+    usage: /bp <open|reload>
