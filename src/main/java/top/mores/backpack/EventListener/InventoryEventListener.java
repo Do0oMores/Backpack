@@ -1,5 +1,6 @@
 package top.mores.backpack.EventListener;
 
+import org.bukkit.ChatColor;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -43,11 +44,13 @@ public class InventoryEventListener implements Listener {
         if (inventoryView.getTitle().equals("§d背包选择")) {
             if (fileUtils.isInCanEditWorlds(player.getWorld().getName())) {
                 //判断点的哪个背包
-                int slot = event.getSlot();
-//                if (fileUtils.isInSyncWorlds(player.getWorld().getName())) {
-//
-//                }
-                singleBackpack.CreateSingleInventory((Player) player, slot + 1);
+                int slot = event.getSlot() + 1;
+                if (fileUtils.isInSyncWorlds(player.getWorld().getName())) {
+                    singleBackpack.SyncSingleBackpack((Player) player, slot);
+                    player.sendMessage("背包" + slot + "已同步");
+                } else {
+                    singleBackpack.CreateSingleInventory((Player) player, slot);
+                }
             } else {
                 player.sendMessage("该世界不可编辑背包！");
             }
@@ -83,7 +86,7 @@ public class InventoryEventListener implements Listener {
                     Backpack.getInstance().getDataConfig().set(path, serializedItems);
                     Backpack.getInstance().saveDataFile();
 
-                    player.sendMessage("背包 " + backpackNumber + " 已保存！");
+                    player.sendMessage(ChatColor.GREEN + "背包 " + backpackNumber + " 已保存！");
                 } else {
                     for (ItemStack item : inventory.getContents()) {
                         if (item != null) {
@@ -96,7 +99,7 @@ public class InventoryEventListener implements Listener {
                     inventory.clear();
                     Backpack.getInstance().getDataConfig().set(path, null);
                     Backpack.getInstance().saveDataFile();
-                    player.sendMessage("背包保存失败，需要有一把主武器和一把副武器，您的物品已返还");
+                    player.sendMessage(ChatColor.DARK_RED + "背包保存失败，需要有一把主武器和一把副武器，您的物品已返还");
                 }
             } else {
                 player.sendMessage("该世界不可编辑背包！");

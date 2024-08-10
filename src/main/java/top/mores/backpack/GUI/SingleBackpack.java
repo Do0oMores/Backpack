@@ -75,4 +75,18 @@ public class SingleBackpack {
         return amount;
     }
 
+    /**
+     * 直接将背包内的物品同步到玩家物品栏
+     *
+     * @param player 玩家
+     * @param slot   背包槽
+     */
+    public void SyncSingleBackpack(Player player, int slot) {
+        //先清空玩家背包再进行处理
+        player.getInventory().clear();
+        Inventory inventory = player.getInventory();
+        for (ItemStack item : SingleBackpackItems(player.getName(), slot)) {
+            inventory.setItem(inventory.firstEmpty(), item);
+        }
+    }
 }
