@@ -1,6 +1,7 @@
 package top.mores.backpack.GUI;
 
 import org.bukkit.Bukkit;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -22,13 +23,11 @@ public class SingleBackpack {
      */
     public ItemStack[] SingleBackpackItems(String playerName, int slot) {
         String path = playerName + ".Backpack" + slot + ".items";
-        if (Backpack.getInstance().getDataConfig().contains(path)) {
-            List<Map<String, Object>> itemList = (List<Map<String, Object>>) Backpack.getInstance().getDataConfig().getList(path);
-            if (itemList != null) {
-                return ItemStackUtil.getItemStacksFromConfig(itemList);
-            }
-        }
-        return new ItemStack[0];
+        FileConfiguration dataConfig = Backpack.getInstance().getDataConfig();
+
+        List<Map<String, Object>> itemList = dataConfig.contains(path) ?
+                (List<Map<String, Object>>) dataConfig.getList(path) : null;
+        return (itemList != null) ? ItemStackUtil.getItemStacksFromConfig(itemList) : new ItemStack[0];
     }
 
     /**
@@ -54,22 +53,20 @@ public class SingleBackpack {
      */
     public int checkItemLoreContains(Inventory inventory, String charValue) {
         int amount = 0;
+        // 获取物品列表
         ItemStack[] itemList = inventory.getContents();
-
+        // 遍历物品
         for (ItemStack item : itemList) {
-            if (item != null) {
-                ItemMeta itemMeta = item.getItemMeta();
-                if (itemMeta != null && itemMeta.hasLore()) {
-                    List<String> loreList = itemMeta.getLore();
-                    if (loreList != null) {
-                        for (String lore : loreList) {
-                            if (lore.contains(charValue)) {
-                                amount++;
-                                break;
-                            }
-                        }
-                    }
-                }
+            if (item == null) continue; // 跳过空物品
+
+            ItemMeta itemMeta = item.getItemMeta();
+            if (itemMeta == null || !itemMeta.hasLore()) continue;
+
+            List<String> loreList = itemMeta.getLore();
+            if (loreList == null) continue; // 跳过没有lore的物品
+
+            if (loreList.stream().anyMatch(lore -> lore.contains(charValue))) {
+                amount++;
             }
         }
         return amount;

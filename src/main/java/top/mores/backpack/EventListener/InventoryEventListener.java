@@ -21,6 +21,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class InventoryEventListener implements Listener {
+
     FileUtils fileUtils = new FileUtils();
     MainGUI mainGUI;
     SingleBackpack singleBackpack = new SingleBackpack();
@@ -40,74 +41,93 @@ public class InventoryEventListener implements Listener {
     public void onPlayerClickInventory(InventoryClickEvent event) {
         InventoryView inventoryView = event.getView();
         HumanEntity player = event.getWhoClicked();
-        //判断是否是创建的背包
-        if (inventoryView.getTitle().equals("§d背包选择")) {
-            if (fileUtils.isInCanEditWorlds(player.getWorld().getName())) {
-                //判断点的哪个背包
-                int slot = event.getSlot() + 1;
-                if(slot<= fileUtils.getBackpackAmount()){
-                    if (fileUtils.isInSyncWorlds(player.getWorld().getName())) {
-                        singleBackpack.SyncSingleBackpack((Player) player, slot);
-                        player.sendMessage("背包" + slot + "已同步");
-                    } else {
-                        singleBackpack.CreateSingleInventory((Player) player, slot);
-                    }
-                }else {
-                    return;
-                }
-            } else {
-                player.sendMessage("该世界不可编辑背包！");
-            }
-            //处理完逻辑后取消事件
-            event.setCancelled(true);
+        String inventoryTitle = inventoryView.getTitle();
+
+        // 判断是否是创建的背包
+        if (!"§d背包选择".equals(inventoryTitle)) {
+            return; // 不是目标背包，直接返回
         }
+
+        // 检查是否在可编辑的世界中
+        if (!fileUtils.isInCanEditWorlds(player.getWorld().getName())) {
+            player.sendMessage("该世界不可编辑背包！");
+            event.setCancelled(true);
+            return;
+        }
+
+        // 获取点击的背包编号
+        int slot = event.getSlot() + 1;
+
+        // 检查背包编号是否在允许的范围内
+        if (slot > fileUtils.getBackpackAmount()) {
+            event.setCancelled(true);
+            return;
+        }
+
+        // 根据玩家所在的世界进行同步或创建
+        if (fileUtils.isInSyncWorlds(player.getWorld().getName())) {
+            singleBackpack.SyncSingleBackpack((Player) player, slot);
+            player.sendMessage("背包" + slot + "已同步");
+        } else {
+            singleBackpack.CreateSingleInventory((Player) player, slot);
+        }
+
+        // 处理完逻辑后取消事件
+        event.setCancelled(true);
     }
 
     @EventHandler
     public void onPlayerCloseInventory(InventoryCloseEvent event) {
         InventoryView inventoryView = event.getView();
-        if (inventoryView.getTitle().contains("§a背包")) {
-            HumanEntity player = event.getPlayer();
-            String playerName = player.getName();
-            if (fileUtils.isInCanEditWorlds(player.getWorld().getName())) {
-                Inventory inventory = event.getInventory();
-                int MainAmount = singleBackpack.checkItemLoreContains(inventory, "主武器");
-                int SecondAmount = singleBackpack.checkItemLoreContains(inventory, "副武器");
+        String title = inventoryView.getTitle();
 
-                //提取背包编号
-                String title = inventoryView.getTitle();
-                String backpackNumber = title.substring(title.lastIndexOf("背包") + 2);
-                String path = playerName + ".Backpack" + backpackNumber + ".items";
-                if (MainAmount == 1 && SecondAmount == 1) {
+        // 判断是否是目标背包
+        if (!title.contains("§a背包")) {
+            return;
+        }
 
-                    // 序列化物品
-                    List<Map<String, Object>> serializedItems = Arrays.stream(inventory.getContents())
-                            .filter(Objects::nonNull) // 过滤掉空的物品栏位
-                            .map(ItemStackUtil::getItemStackMap)
-                            .collect(Collectors.toList());
+        HumanEntity player = event.getPlayer();
+        String playerName = player.getName();
+        String worldName = player.getWorld().getName();
 
-                    // 保存到 data.yml
-                    Backpack.getInstance().getDataConfig().set(path, serializedItems);
-                    Backpack.getInstance().saveDataFile();
+        // 检查是否在可编辑的世界中
+        if (!fileUtils.isInCanEditWorlds(worldName)) {
+            player.sendMessage("该世界不可编辑背包！");
+            return;
+        }
 
-                    player.sendMessage(ChatColor.GREEN + "背包 " + backpackNumber + " 已保存！");
-                } else {
-                    for (ItemStack item : inventory.getContents()) {
-                        if (item != null) {
-                            HashMap<Integer, ItemStack> remainingItems = player.getInventory().addItem(item);
-                            for (ItemStack remaining : remainingItems.values()) {
-                                player.getWorld().dropItemNaturally(player.getLocation(), remaining);
-                            }
-                        }
-                    }
-                    inventory.clear();
-                    Backpack.getInstance().getDataConfig().set(path, null);
-                    Backpack.getInstance().saveDataFile();
-                    player.sendMessage(ChatColor.DARK_RED + "背包保存失败，需要有一把主武器和一把副武器，您的物品已返还");
-                }
-            } else {
-                player.sendMessage("该世界不可编辑背包！");
-            }
+        Inventory inventory = event.getInventory();
+        int mainAmount = singleBackpack.checkItemLoreContains(inventory, "主武器");
+        int secondAmount = singleBackpack.checkItemLoreContains(inventory, "副武器");
+
+        // 提取背包编号
+        String backpackNumber = title.substring(title.lastIndexOf("背包") + 2);
+        String path = playerName + ".Backpack" + backpackNumber + ".items";
+
+        // 确保有一把主武器和一把副武器
+        if (mainAmount == 1 && secondAmount == 1) {
+            // 序列化物品
+            List<Map<String, Object>> serializedItems = Arrays.stream(inventory.getContents())
+                    .filter(Objects::nonNull) // 过滤掉空的物品栏位
+                    .map(ItemStackUtil::getItemStackMap)
+                    .collect(Collectors.toList());
+
+            // 保存到 data.yml
+            Backpack.getInstance().getDataConfig().set(path, serializedItems);
+            Backpack.getInstance().saveDataFile();
+
+            player.sendMessage(ChatColor.GREEN + "背包 " + backpackNumber + " 已保存！");
+        } else {
+            // 将物品返还给玩家并清空背包
+            Map<Integer, ItemStack> remainingItems = player.getInventory().addItem(inventory.getContents());
+            remainingItems.values().forEach(item ->
+                    player.getWorld().dropItemNaturally(player.getLocation(), item)
+            );
+            inventory.clear();
+            Backpack.getInstance().getDataConfig().set(path, null);
+            Backpack.getInstance().saveDataFile();
+
+            player.sendMessage(ChatColor.DARK_RED + "背包保存失败，需要有一把主武器和一把副武器，您的物品已返还");
         }
     }
 }
