@@ -49,4 +49,8 @@ public class FileUtils {
     public boolean isInSyncWorlds(String WorldName) {
         return getSyncWorlds().contains(WorldName);
     }
+
+    public List<String> getDelPlayerInventoryWorld(){
+        return config.getStringList("清除背包的世界");
+    }
 }

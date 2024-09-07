@@ -1,5 +1,6 @@
 package top.mores.backpack.EventListener;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
@@ -7,6 +8,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
+import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
@@ -49,7 +51,7 @@ public class InventoryEventListener implements Listener {
         }
 
         // 检查是否在可编辑的世界中
-        if (!fileUtils.isInCanEditWorlds(player.getWorld().getName())) {
+        if (fileUtils.isInCanEditWorlds(player.getWorld().getName())) {
             player.sendMessage("该世界不可编辑背包！");
             event.setCancelled(true);
             return;
@@ -91,7 +93,7 @@ public class InventoryEventListener implements Listener {
         String worldName = player.getWorld().getName();
 
         // 检查是否在可编辑的世界中
-        if (!fileUtils.isInCanEditWorlds(worldName)) {
+        if (fileUtils.isInCanEditWorlds(worldName)) {
             player.sendMessage("该世界不可编辑背包！");
             return;
         }
@@ -128,6 +130,15 @@ public class InventoryEventListener implements Listener {
             Backpack.getInstance().saveDataFile();
 
             player.sendMessage(ChatColor.DARK_RED + "背包保存失败，需要有一把主武器和一把副武器，您的物品已返还");
+        }
+    }
+
+    @EventHandler
+    public void onPlayerChangeWorld(PlayerChangedWorldEvent event) {
+        String changeWorldName = event.getFrom().getName();
+        if (fileUtils.getDelPlayerInventoryWorld().contains(changeWorldName)) {
+            Player player = event.getPlayer();
+            Bukkit.getScheduler().runTaskLater(Backpack.getInstance(), () -> player.getInventory().clear(), 20L);
         }
     }
 }
