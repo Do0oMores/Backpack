@@ -19,6 +19,7 @@ public final class Backpack extends JavaPlugin {
     public FileConfiguration data;
     private File configFile;
     private File dataFile;
+    private File dataFolder;
 
     @Override
     public void onEnable() {
@@ -98,5 +99,17 @@ public final class Backpack extends JavaPlugin {
             }
         }
         reloadData();
+
+        dataFolder= new File(getDataFolder(), "data");
+        if (!dataFolder.exists()) {
+            boolean isCreateDir = dataFolder.getParentFile().mkdirs();
+            if (!isCreateDir) {
+                getLogger().warning("创建data文件夹失败");
+            }
+        }
+    }
+
+    public String dataPath(){
+        return dataFolder.getAbsolutePath();
     }
 }
