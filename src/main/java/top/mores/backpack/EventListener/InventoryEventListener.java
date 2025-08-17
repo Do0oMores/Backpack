@@ -121,7 +121,12 @@ public class InventoryEventListener implements Listener {
             player.sendMessage(ChatColor.GREEN + "背包 " + backpackNumber + " 已保存！");
         } else {
             // 将物品返还给玩家并清空背包
-            Map<Integer, ItemStack> remainingItems = player.getInventory().addItem(inventory.getContents());
+            ItemStack[] contents = inventory.getContents();
+            Map<Integer, ItemStack> remainingItems = player.getInventory().addItem(
+                    Arrays.stream(contents)
+                            .filter(Objects::nonNull)
+                            .toArray(ItemStack[]::new)
+            );
             remainingItems.values().forEach(item ->
                     player.getWorld().dropItemNaturally(player.getLocation(), item)
             );

@@ -39,7 +39,7 @@ public class FileUtils {
     }
 
     public boolean isInCanEditWorlds(String WorldName) {
-        return getEditWorlds().contains(WorldName);
+        return !getEditWorlds().contains(WorldName);
     }
 
     private List<String> getSyncWorlds() {

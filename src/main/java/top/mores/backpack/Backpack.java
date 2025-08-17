@@ -37,6 +37,7 @@ public final class Backpack extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        saveDataFile();
         getLogger().info("Disabled!");
     }
 
@@ -44,7 +45,7 @@ public final class Backpack extends JavaPlugin {
         return instance;
     }
 
-    public void reloadConfig() {
+    public synchronized void reloadConfig() {
         config = YamlConfiguration.loadConfiguration(configFile);
     }
 
