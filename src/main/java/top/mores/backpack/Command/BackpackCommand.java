@@ -20,7 +20,7 @@ public class BackpackCommand implements CommandExecutor {
                 mainGUI.CreateMainInventory(sender);
             } else if (strings.length == 1 && strings[0].equals("reload")) {
                 if (commandSender.isOp()) {
-                    Backpack.getInstance().reloadConfig();
+                    Backpack.getInstance().reloadConfigFile();
                     Backpack.getInstance().reloadData();
                     commandSender.sendMessage("已重载配置文件");
                 }

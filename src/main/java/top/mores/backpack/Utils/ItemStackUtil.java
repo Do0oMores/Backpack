@@ -78,12 +78,10 @@ public class ItemStackUtil {
             if (isAnHandledMetaType(metaMap.get("meta-type").toString())) {
                 metaMap.remove("meta-type");
 
-                // Simplify leather armor colors
                 if (meta instanceof LeatherArmorMeta) {
                     metaMap.put("color", ((LeatherArmorMeta) meta).getColor().serialize());
                 }
 
-                // Simplify custom potion effects
                 if (meta instanceof PotionMeta) {
                     PotionMeta potionMeta = (PotionMeta) meta;
 
@@ -123,13 +121,11 @@ public class ItemStackUtil {
                 if (!metaMap.containsKey("meta-type")) {
                     metaMap.put("meta-type", getRightMetaType(metaMap.keySet()).name());
 
-                    // Simplify Leather armor colors
                     if (metaMap.containsKey("color")) {
                         Color color = Color.deserialize((Map<String, Object>) metaMap.get("color"));
                         metaMap.put("color", color);
                     }
 
-                    // Simplify custom potion effects
                     if (metaMap.containsKey("custom-effects")) {
                         List<PotionEffect> effectList = ((List<?>) metaMap.get("custom-effects")).stream()
                                 .map(serializedEffect -> new PotionEffect((Map<String, Object>) serializedEffect))
@@ -137,7 +133,6 @@ public class ItemStackUtil {
 
                         metaMap.put("custom-effects", effectList);
 
-                        // handle custom-color only if item is a custom potion
                         if (metaMap.containsKey("custom-color")) {
                             Color color = Color.deserialize((Map<String, Object>) metaMap.get("custom-color"));
                             metaMap.put("custom-color", color);

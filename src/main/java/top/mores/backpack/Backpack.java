@@ -24,14 +24,13 @@ public final class Backpack extends JavaPlugin {
     @Override
     public void onEnable() {
         instance = this;
-        // 初始化 config.yml 和 data.yml
         initFiles();
 
         MainGUI mainGUI = new MainGUI();
         this.getServer().getPluginManager().registerEvents(new InventoryEventListener(mainGUI), this);
         Objects.requireNonNull(getCommand("bp")).setExecutor(new BackpackCommand());
 
-        config = getConfig();
+        config = getConfigFile();
         getLogger().info("Enabled!");
     }
 
@@ -45,14 +44,13 @@ public final class Backpack extends JavaPlugin {
         return instance;
     }
 
-    public synchronized void reloadConfig() {
+    public void reloadConfigFile() {
         config = YamlConfiguration.loadConfiguration(configFile);
     }
 
-    @Override
-    public @NotNull FileConfiguration getConfig() {
+    public @NotNull FileConfiguration getConfigFile() {
         if (config == null) {
-            reloadConfig();
+            reloadConfigFile();
         }
         return config;
     }
@@ -89,7 +87,7 @@ public final class Backpack extends JavaPlugin {
             }
             saveResource("config.yml", false);
         }
-        reloadConfig();
+        reloadConfigFile();
 
         dataFile = new File(getDataFolder(), "data.yml");
         if (!dataFile.exists()) {
