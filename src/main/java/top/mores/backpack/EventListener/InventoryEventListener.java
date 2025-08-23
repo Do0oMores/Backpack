@@ -132,9 +132,11 @@ public class InventoryEventListener implements Listener {
                 player.sendMessage(ChatColor.GREEN + "背包 " + backpackNumber + " 已保存！");
             } else {
                 String errorMsg = invalidSlots.stream()
-                        .map(slot -> "第" + (slot + 1) + "格需要: " + String.join(" / ", loreMap.get(slot)))
+                        .map(slot -> fileUtils.getNoMatchERROR()
+                                .replace("%slot%", String.valueOf(slot + 1))
+                                .replace("%lore%", String.join(" / ", loreMap.get(slot))))
                         .collect(Collectors.joining("， "));
-                player.sendMessage(fileUtils.getNOMatchItemsERROR() + " → " + errorMsg);
+                player.sendMessage(fileUtils.getNOMatchItemsERROR() + errorMsg);
                 returnInvItems(inventory, player, path);
             }
         }

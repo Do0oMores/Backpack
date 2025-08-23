@@ -96,4 +96,8 @@ public class FileUtils {
     public String getNOMatchItemsERROR(){
         return config.getString("背包栏锁定.不符合背包配置提示");
     }
+
+    public String getNoMatchERROR(){
+        return config.getString("背包栏锁定.不符合具体提示");
+    }
 }
