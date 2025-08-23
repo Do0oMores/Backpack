@@ -51,17 +51,8 @@ public class InventoryEventListener implements Listener {
         if (!"§d背包选择".equals(inventoryTitle)) {
             return; // 不是目标背包，直接返回
         }
-
-        // 检查是否在可编辑的世界中
-        if (fileUtils.isInCanEditWorlds(player.getWorld().getName())) {
-            player.sendMessage(fileUtils.getEditBPERROR());
-            event.setCancelled(true);
-            return;
-        }
-
         // 获取点击的背包编号
         int slot = event.getSlot() + 1;
-
         // 检查背包编号是否在允许的范围内
         if (slot > fileUtils.getBackpackAmount()) {
             event.setCancelled(true);
@@ -71,13 +62,20 @@ public class InventoryEventListener implements Listener {
         // 根据玩家所在的世界进行同步或创建
         if (fileUtils.isInSyncWorlds(player.getWorld().getName())) {
             singleBackpack.SyncSingleBackpack((Player) player, slot);
-            player.sendMessage("背包" + slot + "已同步");
-        } else {
-            singleBackpack.CreateSingleInventory((Player) player, slot);
+            player.sendMessage(fileUtils.getSyncSuccessTip()
+                    .replace("%slot%", String.valueOf(slot)));
+            event.setCancelled(true);
+            player.closeInventory();
+            return;
         }
 
-        // 处理完逻辑后取消事件
-        event.setCancelled(true);
+        // 检查是否在可编辑的世界中
+        if (fileUtils.isInCanEditWorlds(player.getWorld().getName())) {
+            singleBackpack.CreateSingleInventory((Player) player, slot);
+            event.setCancelled(true);
+        }else {
+            player.sendMessage(fileUtils.getEditBPERROR());
+        }
     }
 
     @EventHandler
@@ -95,10 +93,10 @@ public class InventoryEventListener implements Listener {
         String worldName = player.getWorld().getName();
 
         //检查是否在可编辑的世界中
-        if (fileUtils.isInCanEditWorlds(worldName)) {
-            player.sendMessage(fileUtils.getEditBPERROR());
-            return;
-        }
+//        if (fileUtils.isInCanEditWorlds(worldName)) {
+//            player.sendMessage(fileUtils.getEditBPERROR());
+//            return;
+//        }
 
         Inventory inventory = event.getInventory();
         int mainAmount = singleBackpack.checkItemLoreContains(inventory, fileUtils.getBPLoreLockItem().get(0));
@@ -111,8 +109,10 @@ public class InventoryEventListener implements Listener {
                 List<Map<String, Object>> serializedItems = getInvItems(inventory);
                 Backpack.getInstance().getDataConfig().set(path, serializedItems);
                 Backpack.getInstance().saveDataFile();
-                player.sendMessage(ChatColor.GREEN + "背包 " + backpackNumber + " 已保存！");
+                player.sendMessage(fileUtils.getSaveSuccessTip()
+                        .replace("%number%", backpackNumber));
             } else {
+                player.sendMessage(fileUtils.getBPSaveERROR());
                 returnInvItems(inventory, player, path);
             }
         }

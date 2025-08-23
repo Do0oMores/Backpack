@@ -47,7 +47,7 @@ public class FileUtils {
     }
 
     public boolean isInCanEditWorlds(String WorldName) {
-        return !getEditWorlds().contains(WorldName);
+        return getEditWorlds().contains(WorldName);
     }
 
     private List<String> getSyncWorlds() {
@@ -104,5 +104,13 @@ public class FileUtils {
 
     public String getNoMatchERROR(){
         return getConfig().getString("背包栏锁定.不符合具体提示");
+    }
+
+    public String getSyncSuccessTip(){
+        return getConfig().getString("背包同步成功提示");
+    }
+
+    public String getSaveSuccessTip(){
+        return getConfig().getString("背包保存成功提示");
     }
 }

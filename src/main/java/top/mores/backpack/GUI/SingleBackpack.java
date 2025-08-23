@@ -8,11 +8,13 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import top.mores.backpack.Backpack;
 import top.mores.backpack.Utils.ItemStackUtil;
+import top.mores.backpack.Utils.MatchUtil;
 
 import java.util.List;
 import java.util.Map;
 
 public class SingleBackpack {
+    MatchUtil matchUtil = new MatchUtil();
 
     /**
      * 单个背包物品数组
@@ -79,11 +81,17 @@ public class SingleBackpack {
      * @param slot   背包槽
      */
     public void SyncSingleBackpack(Player player, int slot) {
-        //先清空玩家背包再进行处理
-        player.getInventory().clear();
-        Inventory inventory = player.getInventory();
-        for (ItemStack item : SingleBackpackItems(player.getName(), slot)) {
-            inventory.setItem(inventory.firstEmpty(), item);
-        }
+        Bukkit.getScheduler().runTaskAsynchronously(Backpack.getInstance(), () -> {
+            List<ItemStack> items = List.of(SingleBackpackItems(player.getName(), slot));
+            matchUtil.returnItem(items, player);
+
+            Bukkit.getScheduler().runTask(Backpack.getInstance(), () -> {
+                player.getInventory().clear();
+                Inventory inventory = player.getInventory();
+                for (ItemStack item : items) {
+                    inventory.setItem(inventory.firstEmpty(), item);
+                }
+            });
+        });
     }
 }

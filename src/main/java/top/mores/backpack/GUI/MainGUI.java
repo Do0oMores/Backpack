@@ -20,7 +20,7 @@ import java.util.Map;
 public class MainGUI {
 
     FileUtils fileUtils = new FileUtils();
-    final String separatorLine = "§7§m§e§m-§e§m-§6§m-§6§m-§8§m---------------------§6§m-§6§m-§e§m-§e§m-§7§m§m";
+    final String separatorLine = "§7§m§e§m-§e§m-§6§m-§6§m-§8§m--------§6§m-§6§m-§e§m-§e§m-§7§m§m";
     final FileConfiguration data = Backpack.getInstance().getDataConfig();
 
     /**
@@ -80,7 +80,6 @@ public class MainGUI {
             // 将物品添加到背包列表中
             items.add(itemStack);
         }
-
         // 返回背包列表
         return items;
     }

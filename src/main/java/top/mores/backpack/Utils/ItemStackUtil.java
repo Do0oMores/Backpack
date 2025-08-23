@@ -99,7 +99,6 @@ public class ItemStackUtil {
             }
             result.put("meta", metaMap);
         }
-
         return result;
     }
 
