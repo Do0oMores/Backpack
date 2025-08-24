@@ -47,10 +47,10 @@ public class MatchUtil {
                                     Backpack.getInstance().getDataConfig().getMapList(path)
                             );
                         } else {
-                            Bukkit.getScheduler().runTask(Backpack.getInstance(), () ->
-                                    player.sendMessage("物品匹配数据未写入！"
-                                            + Backpack.getInstance().getDataConfig().getMapList(path))
-                            );
+//                            Bukkit.getScheduler().runTask(Backpack.getInstance(), () ->
+//                                    player.sendMessage("物品匹配数据未写入！"
+//                                            + Backpack.getInstance().getDataConfig().getMapList(path))
+//                            );
                             return new ItemStack[0];
                         }
                     })

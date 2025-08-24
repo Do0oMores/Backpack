@@ -59,7 +59,7 @@ public class FileUtils {
     }
 
     public List<String> getDelPlayerInventoryWorld(){
-        return getConfig().getStringList("清除背包的世界");
+        return getConfig().getStringList("清除背包的世界.世界列表");
     }
 
     public boolean getEnableBPLoreLock(){
@@ -112,5 +112,25 @@ public class FileUtils {
 
     public String getSaveSuccessTip(){
         return getConfig().getString("背包保存成功提示");
+    }
+
+    public boolean getEnableClearInv(){
+        return getConfig().getBoolean("清除背包的世界.是否启用");
+    }
+
+    public Integer getCloseSyncInvTime(){
+        return getConfig().getInt("同步背包自动关闭时间");
+    }
+
+    public String getCloseSyncInvTip(){
+        return getConfig().getString("同步背包自动选择提示");
+    }
+
+    public String getNotAllowedRunCommand(){
+        return getConfig().getString("空背包执行命令");
+    }
+
+    public String getEmptyBPTip(){
+        return getConfig().getString("空背包提示");
     }
 }
