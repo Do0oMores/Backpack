@@ -181,7 +181,7 @@ public class InventoryEventListener implements Listener {
                             player.sendMessage(fileUtils.getCloseSyncInvTip());
                         }
                     }, fileUtils.getCloseSyncInvTime() * 20L);
-                }, 20L);
+                }, fileUtils.getSyncTime() * 20L);
             }
         }
     }

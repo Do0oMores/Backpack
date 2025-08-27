@@ -133,4 +133,8 @@ public class FileUtils {
     public String getEmptyBPTip(){
         return getConfig().getString("空背包提示");
     }
+
+    public Integer getSyncTime(){
+        return getConfig().getInt("延迟同步背包的时间");
+    }
 }
