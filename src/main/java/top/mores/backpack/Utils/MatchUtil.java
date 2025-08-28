@@ -47,10 +47,6 @@ public class MatchUtil {
                                     Backpack.getInstance().getDataConfig().getMapList(path)
                             );
                         } else {
-//                            Bukkit.getScheduler().runTask(Backpack.getInstance(), () ->
-//                                    player.sendMessage("物品匹配数据未写入！"
-//                                            + Backpack.getInstance().getDataConfig().getMapList(path))
-//                            );
                             return new ItemStack[0];
                         }
                     })
@@ -60,14 +56,25 @@ public class MatchUtil {
                 Bukkit.getScheduler().runTask(Backpack.getInstance(), () -> {
                     Inventory inventory = player.getInventory();
                     itemsToReturn.forEach(item -> {
-                        if (inventory.firstEmpty() == -1) {
+                        int slot=getFirstEmptyInMainInventory(inventory);
+                        if (slot == -1) {
                             player.getWorld().dropItemNaturally(player.getLocation(), item);
                         } else {
-                            inventory.setItem(inventory.firstEmpty(), item);
+                            inventory.setItem(slot, item);
                         }
                     });
                 });
             }
         });
+    }
+
+    private int getFirstEmptyInMainInventory(Inventory inventory) {
+        for (int i = 9; i < 36; i++) {
+            ItemStack item = inventory.getItem(i);
+            if (item == null || item.getType() == Material.AIR) {
+                return i;
+            }
+        }
+        return -1;
     }
 }

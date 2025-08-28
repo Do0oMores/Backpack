@@ -87,16 +87,18 @@ public class InventoryEventListener implements Listener {
         if (!(human instanceof Player player)) return;
 
         if ("§d背包选择".equals(title)) {
-            if (fileUtils.isInSyncWorlds(player.getWorld().getName())) {
-                int firstNonEmptyBackpack = getFirstNonEmptyBackpack(
-                        player.getName(), Backpack.getInstance().getDataConfig());
-                if (firstNonEmptyBackpack != -1) {
-                    singleBackpack.SyncSingleBackpack(player, firstNonEmptyBackpack);
-                    player.sendMessage(fileUtils.getCloseSyncInvTip());
-                } else {
-                    String command = fileUtils.getNotAllowedRunCommand();
-                    if (command != null && !command.isEmpty()) {
-                        Bukkit.dispatchCommand(player, command);
+            if (!checkEmptyInventory(player.getInventory())){
+                if (fileUtils.isInSyncWorlds(player.getWorld().getName())) {
+                    int firstNonEmptyBackpack = getFirstNonEmptyBackpack(
+                            player.getName(), Backpack.getInstance().getDataConfig());
+                    if (firstNonEmptyBackpack != -1) {
+                        singleBackpack.SyncSingleBackpack(player, firstNonEmptyBackpack);
+                        player.sendMessage(fileUtils.getCloseSyncInvTip());
+                    } else {
+                        String command = fileUtils.getNotAllowedRunCommand();
+                        if (command != null && !command.isEmpty()) {
+                            Bukkit.dispatchCommand(player, command);
+                        }
                     }
                 }
             }
@@ -177,8 +179,6 @@ public class InventoryEventListener implements Listener {
                     Bukkit.getScheduler().runTaskLater(Backpack.getInstance(), () -> {
                         if (player.getOpenInventory().getTitle().equals("§d背包选择")) {
                             player.closeInventory();
-                            singleBackpack.SyncSingleBackpack(player, firstNonEmptyBackpack);
-                            player.sendMessage(fileUtils.getCloseSyncInvTip());
                         }
                     }, fileUtils.getCloseSyncInvTime() * 20L);
                 }, fileUtils.getSyncTime() * 20L);
@@ -254,5 +254,15 @@ public class InventoryEventListener implements Listener {
             }
         }
         return -1;
+    }
+
+    public boolean checkEmptyInventory(Inventory inventory) {
+        for (int slot = 0; slot < 35; slot++) {
+            ItemStack item = inventory.getItem(slot);
+            if (item == null || item.getType() == Material.AIR) {
+                return true;
+            }
+        }
+        return false;
     }
 }
