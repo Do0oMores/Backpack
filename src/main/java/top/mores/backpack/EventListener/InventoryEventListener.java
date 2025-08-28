@@ -257,7 +257,7 @@ public class InventoryEventListener implements Listener {
     }
 
     public boolean checkEmptyInventory(Inventory inventory) {
-        for (int slot = 0; slot < 35; slot++) {
+        for (int slot = 0; slot < 36; slot++) {
             ItemStack item = inventory.getItem(slot);
             if (item == null || item.getType() == Material.AIR) {
                 return true;
