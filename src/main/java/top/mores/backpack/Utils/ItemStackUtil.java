@@ -19,6 +19,9 @@ import static org.bukkit.configuration.serialization.ConfigurationSerialization.
 
 public class ItemStackUtil {
 
+    // 背包物品标识
+    public static final String BACKPACK_ITEM_LORE = "§b§l背包物品";
+
     private enum HandledMetaType {
         POTION, ENCHANTED, BOOK_SIGNED, BOOK, BANNER, MAP, FIREWORK, LEATHER_ARMOR, COLORABLE_ARMOR, ARMOR, UNSPECIFIC
     }
@@ -74,8 +77,17 @@ public class ItemStackUtil {
 
         ItemMeta meta = itemStack.getItemMeta();
         if (!Bukkit.getItemFactory().equals(meta, null)) {
-            Map<String, Object> metaMap = new LinkedHashMap<>(meta.serialize());
-            if (isAnHandledMetaType(metaMap.get("meta-type").toString())) {
+            Map<String, Object> metaMap = null;
+            if (meta != null) {
+                metaMap = new LinkedHashMap<>(meta.serialize());
+                
+                // 添加背包物品标识到lore
+                List<String> lore = meta.hasLore() ? meta.getLore() : new ArrayList<>();
+                if (lore == null) lore = new ArrayList<>();
+                lore.add(BACKPACK_ITEM_LORE);
+                metaMap.put("lore", lore);
+            }
+            if (metaMap != null && isAnHandledMetaType(metaMap.get("meta-type").toString())) {
                 metaMap.remove("meta-type");
 
                 if (meta instanceof LeatherArmorMeta) {
@@ -92,7 +104,7 @@ public class ItemStackUtil {
                         metaMap.put("custom-effects", customEffectMeta);
 
                         if (potionMeta.hasColor()) {
-                            metaMap.put("custom-color", potionMeta.getColor().serialize());
+                            metaMap.put("custom-color", Objects.requireNonNull(potionMeta.getColor()).serialize());
                         }
                     }
                 }
@@ -163,5 +175,32 @@ public class ItemStackUtil {
         return Arrays.stream(itemStackArray)
                 .map(itemStack -> ofNullable(itemStack).map(ItemStack::new).orElse(null))
                 .toArray(ItemStack[]::new);
+    }
+
+    // 检查物品是否为背包物品
+    public static boolean isBackpackItem(ItemStack item) {
+        if (item == null || item.getType() == Material.AIR) return false;
+        ItemMeta meta = item.getItemMeta();
+        if (meta == null || !meta.hasLore()) return false;
+        List<String> lore = meta.getLore();
+        return lore != null && lore.contains(BACKPACK_ITEM_LORE);
+    }
+
+    // 从玩家背包中移除背包物品
+    public static void removeBackpackItems(org.bukkit.inventory.PlayerInventory inventory) {
+        for (int i = 0; i < inventory.getSize(); i++) {
+            ItemStack item = inventory.getItem(i);
+            if (isBackpackItem(item)) {
+                inventory.setItem(i, new ItemStack(Material.AIR));
+            }
+        }
+        // 检查盔甲栏
+        ItemStack[] armorContents = inventory.getArmorContents();
+        for (int i = 0; i < armorContents.length; i++) {
+            if (isBackpackItem(armorContents[i])) {
+                armorContents[i] = new ItemStack(Material.AIR);
+            }
+        }
+        inventory.setArmorContents(armorContents);
     }
 }

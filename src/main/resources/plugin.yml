@@ -1,10 +1,10 @@
 name: Backpack
-version: '1.0-SNAPSHOT'
+version: '2.3.3-SNAPSHOT'
 main: top.mores.backpack.Backpack
 api-version: '1.18'
-authors: [Mores]
+authors: [Mores, Harry_H2O]
 description: 背包
 commands:
   bp:
     description: Backpack command
-    usage: /bp <open|reload>
+    usage: /bp <open|reload|armor>

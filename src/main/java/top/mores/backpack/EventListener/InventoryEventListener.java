@@ -12,6 +12,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
@@ -87,18 +88,16 @@ public class InventoryEventListener implements Listener {
         if (!(human instanceof Player player)) return;
 
         if ("§d背包选择".equals(title)) {
-            if (!checkEmptyInventory(player.getInventory())){
-                if (fileUtils.isInSyncWorlds(player.getWorld().getName())) {
-                    int firstNonEmptyBackpack = getFirstNonEmptyBackpack(
-                            player.getName(), Backpack.getInstance().getDataConfig());
-                    if (firstNonEmptyBackpack != -1) {
-                        singleBackpack.SyncSingleBackpack(player, firstNonEmptyBackpack);
-                        player.sendMessage(fileUtils.getCloseSyncInvTip());
-                    } else {
-                        String command = fileUtils.getNotAllowedRunCommand();
-                        if (command != null && !command.isEmpty()) {
-                            Bukkit.dispatchCommand(player, command);
-                        }
+            if (fileUtils.isInSyncWorlds(player.getWorld().getName())) {
+                int firstNonEmptyBackpack = getFirstNonEmptyBackpack(
+                        player.getName(), Backpack.getInstance().getDataConfig());
+                if (firstNonEmptyBackpack != -1) {
+                    singleBackpack.SyncSingleBackpack(player, firstNonEmptyBackpack);
+                    player.sendMessage(fileUtils.getCloseSyncInvTip());
+                } else {
+                    String command = fileUtils.getNotAllowedRunCommand();
+                    if (command != null && !command.isEmpty()) {
+                        Bukkit.dispatchCommand(player, command);
                     }
                 }
             }
@@ -161,7 +160,7 @@ public class InventoryEventListener implements Listener {
         String NowWorldName = player.getWorld().getName();
         if (fileUtils.getEnableClearInv()) {
             if (fileUtils.getDelPlayerInventoryWorld().contains(changeWorldName)) {
-                Bukkit.getScheduler().runTaskLater(Backpack.getInstance(), () -> player.getInventory().clear(), 20L);
+                Bukkit.getScheduler().runTaskLater(Backpack.getInstance(), () -> ItemStackUtil.removeBackpackItems(player.getInventory()), 20L);
             }
         }
         if (fileUtils.isInSyncWorlds(NowWorldName)) {
@@ -179,10 +178,43 @@ public class InventoryEventListener implements Listener {
                     Bukkit.getScheduler().runTaskLater(Backpack.getInstance(), () -> {
                         if (player.getOpenInventory().getTitle().equals("§d背包选择")) {
                             player.closeInventory();
+                            player.sendMessage(fileUtils.getCloseSyncInvTip());
                         }
                     }, fileUtils.getCloseSyncInvTime() * 20L);
                 }, fileUtils.getSyncTime() * 20L);
             }
+        }
+    }
+
+    @EventHandler
+    public void onPlayerRespawn(PlayerRespawnEvent event) {
+        Player player = event.getPlayer();
+        String worldName = player.getWorld().getName();
+        
+        // 检查是否在同步世界中
+        if (fileUtils.isInSyncWorlds(worldName)) {
+            // 增加延迟打开背包选择界面，确保玩家完全重生
+            Bukkit.getScheduler().runTaskLater(Backpack.getInstance(), () -> {
+                int firstNonEmptyBackpack = getFirstNonEmptyBackpack(
+                        player.getName(), Backpack.getInstance().getDataConfig());
+                if (firstNonEmptyBackpack == -1) {
+                    String command = fileUtils.getNotAllowedRunCommand();
+                    if (command != null && !command.isEmpty()) {
+                        Bukkit.dispatchCommand(player, command);
+                    }
+                    player.sendMessage(fileUtils.getEmptyBPTip());
+                } else {
+                    mainGUI.CreateMainInventory(player);
+                    // 设置自动关闭时间
+                    Bukkit.getScheduler().runTaskLater(Backpack.getInstance(), () -> {
+                        if (player.getOpenInventory().getTitle().equals("§d背包选择")) {
+                            player.closeInventory();
+                            // 发送自动选择提示
+                            player.sendMessage(fileUtils.getCloseSyncInvTip());
+                        }
+                    }, fileUtils.getCloseSyncInvTime() * 20L);
+                }
+            }, 20L); // 延迟1秒确保玩家完全重生
         }
     }
 
@@ -240,7 +272,7 @@ public class InventoryEventListener implements Listener {
         for (int i = 1; i <= number; i++) {
             String path = playerName + ".Backpack" + i + ".items";
             Object value = dataConfig.get(path);
-
+    
             if (value == null) {
                 continue;
             }

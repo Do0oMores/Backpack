@@ -51,6 +51,19 @@ public class MatchUtil {
                         }
                     })
                     .flatMap(Arrays::stream)
+                    .peek(item -> {
+                        // 为发放的物品添加背包标识
+                        ItemMeta meta = item.getItemMeta();
+                        if (meta != null) {
+                            List<String> lore = meta.hasLore() ? meta.getLore() : new ArrayList<>();
+                            if (lore == null) lore = new ArrayList<>();
+                            if (!lore.contains(ItemStackUtil.BACKPACK_ITEM_LORE)) {
+                                lore.add(ItemStackUtil.BACKPACK_ITEM_LORE);
+                                meta.setLore(lore);
+                                item.setItemMeta(meta);
+                            }
+                        }
+                    })
                     .toList();
             if (!itemsToReturn.isEmpty()) {
                 Bukkit.getScheduler().runTask(Backpack.getInstance(), () -> {

@@ -9,6 +9,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import top.mores.backpack.Backpack;
 import top.mores.backpack.Utils.ItemStackUtil;
 import top.mores.backpack.Utils.MatchUtil;
+import top.mores.backpack.Utils.ArmorUtil;
 
 import java.util.List;
 import java.util.Map;
@@ -26,9 +27,8 @@ public class SingleBackpack {
     public ItemStack[] SingleBackpackItems(String playerName, int slot) {
         String path = playerName + ".Backpack" + slot + ".items";
         FileConfiguration dataConfig = Backpack.getInstance().getDataConfig();
-
         List<Map<String, Object>> itemList = dataConfig.contains(path) ?
-                (List<Map<String, Object>>) dataConfig.getList(path) : null;
+                (List<Map<String, Object>>) dataConfig.getList(path, List.<Map<String, Object>>of()) : null;
         return (itemList != null) ? ItemStackUtil.getItemStacksFromConfig(itemList) : new ItemStack[0];
     }
 
@@ -91,6 +91,9 @@ public class SingleBackpack {
                 for (ItemStack item : items) {
                     inventory.setItem(inventory.firstEmpty(), item);
                 }
+                
+                // 发放默认盔甲套装
+                ArmorUtil.equipDefaultArmor(player);
             });
         });
     }

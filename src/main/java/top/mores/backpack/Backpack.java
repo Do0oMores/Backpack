@@ -5,11 +5,14 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import top.mores.backpack.Command.BackpackCommand;
+import top.mores.backpack.Command.BackpackTabCompleter;
 import top.mores.backpack.EventListener.InventoryEventListener;
 import top.mores.backpack.GUI.MainGUI;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.Objects;
 
 public final class Backpack extends JavaPlugin {
@@ -25,10 +28,12 @@ public final class Backpack extends JavaPlugin {
     public void onEnable() {
         instance = this;
         initFiles();
+        updateConfig(); // 添加这行来自动更新配置文件
 
         MainGUI mainGUI = new MainGUI();
         this.getServer().getPluginManager().registerEvents(new InventoryEventListener(mainGUI), this);
         Objects.requireNonNull(getCommand("bp")).setExecutor(new BackpackCommand());
+        Objects.requireNonNull(getCommand("bp")).setTabCompleter(new BackpackTabCompleter());
 
         config = getConfigFile();
         getLogger().info("Enabled!");
@@ -105,6 +110,36 @@ public final class Backpack extends JavaPlugin {
             if (!isCreateDir) {
                 getLogger().warning("创建data文件夹失败");
             }
+        }
+    }
+
+    // 添加配置文件自动更新方法
+    private void updateConfig() {
+        try {
+            // 读取插件jar中的默认配置文件
+            InputStream defaultConfigStream = getResource("config.yml");
+            if (defaultConfigStream != null) {
+                YamlConfiguration defaultConfig = YamlConfiguration.loadConfiguration(new InputStreamReader(defaultConfigStream));
+                
+                // 检查并更新配置项
+                boolean updated = false;
+                
+                // 检查每个默认配置项是否存在
+                for (String key : defaultConfig.getKeys(true)) {
+                    if (!config.contains(key)) {
+                        config.set(key, defaultConfig.get(key));
+                        updated = true;
+                    }
+                }
+                
+                // 如果有更新，保存配置文件
+                if (updated) {
+                    config.save(configFile);
+                    getLogger().info("配置文件已自动更新");
+                }
+            }
+        } catch (Exception e) {
+            getLogger().warning("自动更新配置文件时出错: " + e.getMessage());
         }
     }
 
