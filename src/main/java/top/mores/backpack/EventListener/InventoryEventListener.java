@@ -88,16 +88,18 @@ public class InventoryEventListener implements Listener {
         if (!(human instanceof Player player)) return;
 
         if ("§d背包选择".equals(title)) {
-            if (fileUtils.isInSyncWorlds(player.getWorld().getName())) {
-                int firstNonEmptyBackpack = getFirstNonEmptyBackpack(
-                        player.getName(), Backpack.getInstance().getDataConfig());
-                if (firstNonEmptyBackpack != -1) {
-                    singleBackpack.SyncSingleBackpack(player, firstNonEmptyBackpack);
-                    player.sendMessage(fileUtils.getCloseSyncInvTip());
-                } else {
-                    String command = fileUtils.getNotAllowedRunCommand();
-                    if (command != null && !command.isEmpty()) {
-                        Bukkit.dispatchCommand(player, command);
+            if (!checkEmptyInventory(player.getInventory())){
+                if (fileUtils.isInSyncWorlds(player.getWorld().getName())) {
+                    int firstNonEmptyBackpack = getFirstNonEmptyBackpack(
+                            player.getName(), Backpack.getInstance().getDataConfig());
+                    if (firstNonEmptyBackpack != -1) {
+                        singleBackpack.SyncSingleBackpack(player, firstNonEmptyBackpack);
+                        player.sendMessage(fileUtils.getCloseSyncInvTip());
+                    } else {
+                        String command = fileUtils.getNotAllowedRunCommand();
+                        if (command != null && !command.isEmpty()) {
+                            Bukkit.dispatchCommand(player, command);
+                        }
                     }
                 }
             }
