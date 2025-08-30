@@ -4,18 +4,14 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.PlayerInventory;
 import org.jetbrains.annotations.NotNull;
 import top.mores.backpack.Backpack;
 import top.mores.backpack.GUI.MainGUI;
-import top.mores.backpack.Utils.ItemStackUtil;
 import top.mores.backpack.Utils.MatchUtil;
 import top.mores.backpack.Utils.ArmorUtil;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 public class BackpackCommand implements CommandExecutor {
     MainGUI mainGUI = new MainGUI();

@@ -8,6 +8,7 @@ import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
@@ -77,6 +78,28 @@ public class InventoryEventListener implements Listener {
             event.setCancelled(true);
         } else {
             player.sendMessage(fileUtils.getEditBPERROR());
+        }
+    }
+
+    @EventHandler
+    public void onPlayerDeath(PlayerDeathEvent event) {
+        Player player = event.getEntity();
+        String worldName = player.getWorld().getName();
+        
+        // 检查是否在需要清除背包的世界
+        if (fileUtils.getEnableClearInv() && fileUtils.getDelPlayerInventoryWorld().contains(worldName)) {
+            // 清除玩家背包中的背包物品
+            Bukkit.getScheduler().runTaskLater(Backpack.getInstance(), () -> {
+                ItemStackUtil.removeBackpackItems(player.getInventory());
+            }, 20L); // 延迟1 tick确保死亡事件处理完成
+        }
+        
+        // 检查是否在同步世界中
+        if (fileUtils.isInSyncWorlds(worldName)) {
+            // 延迟打开背包选择界面
+            Bukkit.getScheduler().runTaskLater(Backpack.getInstance(), () -> {
+                mainGUI.CreateMainInventory(player);
+            }, 20L); // 延迟1秒确保玩家完全死亡并重生
         }
     }
 
@@ -179,6 +202,8 @@ public class InventoryEventListener implements Listener {
                     mainGUI.CreateMainInventory(player);
                     Bukkit.getScheduler().runTaskLater(Backpack.getInstance(), () -> {
                         if (player.getOpenInventory().getTitle().equals("§d背包选择")) {
+                            // 自动选择第一个非空背包
+                            singleBackpack.SyncSingleBackpack(player, firstNonEmptyBackpack);
                             player.closeInventory();
                             player.sendMessage(fileUtils.getCloseSyncInvTip());
                         }
@@ -210,6 +235,8 @@ public class InventoryEventListener implements Listener {
                     // 设置自动关闭时间
                     Bukkit.getScheduler().runTaskLater(Backpack.getInstance(), () -> {
                         if (player.getOpenInventory().getTitle().equals("§d背包选择")) {
+                            // 自动选择第一个非空背包
+                            singleBackpack.SyncSingleBackpack(player, firstNonEmptyBackpack);
                             player.closeInventory();
                             // 发送自动选择提示
                             player.sendMessage(fileUtils.getCloseSyncInvTip());

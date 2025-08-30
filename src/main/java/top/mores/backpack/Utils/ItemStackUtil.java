@@ -81,10 +81,14 @@ public class ItemStackUtil {
             if (meta != null) {
                 metaMap = new LinkedHashMap<>(meta.serialize());
                 
-                // 添加背包物品标识到lore
+                // 添加背包物品标识到lore（仅当不存在时）
                 List<String> lore = meta.hasLore() ? meta.getLore() : new ArrayList<>();
                 if (lore == null) lore = new ArrayList<>();
-                lore.add(BACKPACK_ITEM_LORE);
+                
+                // 检查是否已包含背包物品标识
+                if (!lore.contains(BACKPACK_ITEM_LORE)) {
+                    lore.add(BACKPACK_ITEM_LORE);
+                }
                 metaMap.put("lore", lore);
             }
             if (metaMap != null && isAnHandledMetaType(metaMap.get("meta-type").toString())) {
