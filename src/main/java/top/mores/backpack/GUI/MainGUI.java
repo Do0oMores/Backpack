@@ -8,6 +8,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import top.mores.backpack.Backpack;
 import top.mores.backpack.Utils.ChatColorUtil;
 import top.mores.backpack.Utils.FileUtils;
@@ -97,6 +99,9 @@ public class MainGUI {
                 MainInventory.setItem(MainInventory.firstEmpty(), item);
             }
         }
+        player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE,
+                20 * fileUtils.getCloseSyncInvTime(), 255,
+                false, false,true));
         player.openInventory(MainInventory);
     }
 }

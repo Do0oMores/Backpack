@@ -18,6 +18,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.potion.PotionEffectType;
 import top.mores.backpack.Backpack;
 import top.mores.backpack.GUI.MainGUI;
 import top.mores.backpack.GUI.SingleBackpack;
@@ -176,6 +177,7 @@ public class InventoryEventListener implements Listener {
                 returnInvItems(inventory, player, path);
             }
         }
+        player.removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
     }
 
     @EventHandler
