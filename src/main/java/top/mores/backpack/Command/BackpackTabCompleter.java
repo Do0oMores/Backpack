@@ -31,7 +31,6 @@ public class BackpackTabCompleter implements TabCompleter {
                     completions.add("armor");
                     completions.add("set");
                 }
-                
                 // 根据已输入的内容过滤
                 return filterCompletions(completions, args[0]);
             } else if (args.length == 2 && args[0].equals("set") && sender.isOp()) {
@@ -46,7 +45,6 @@ public class BackpackTabCompleter implements TabCompleter {
                 return filterCompletions(completions, args[2]);
             }
         }
-        
         return completions;
     }
     

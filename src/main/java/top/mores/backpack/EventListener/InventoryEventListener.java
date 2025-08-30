@@ -53,10 +53,14 @@ public class InventoryEventListener implements Listener {
 
         // 判断是否是创建的背包
         if (!"§d背包选择".equals(inventoryTitle)) {
-            return; // 不是目标背包，直接返回
+            return;
         }
-        // 获取点击的背包编号
-        int slot = event.getSlot() + 1;
+        int slot = event.getSlot();
+        if (slot < 0 || slot >= event.getInventory().getSize()) {
+            event.setCancelled(true);
+            return;
+        }
+        slot +=1;
         // 检查背包编号是否在允许的范围内
         if (slot > fileUtils.getBackpackAmount()) {
             event.setCancelled(true);
@@ -111,8 +115,13 @@ public class InventoryEventListener implements Listener {
         HumanEntity human = event.getPlayer();
         if (!(human instanceof Player player)) return;
 
+        if (fileUtils.isInCanEditWorlds(player.getWorld().getName())) {
+            clearTargetLore(player.getInventory());
+        }
+
+        player.removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
         if ("§d背包选择".equals(title)) {
-            if (!checkEmptyInventory(player.getInventory())){
+            if (checkEmptyInventory(player.getInventory())){
                 if (fileUtils.isInSyncWorlds(player.getWorld().getName())) {
                     int firstNonEmptyBackpack = getFirstNonEmptyBackpack(
                             player.getName(), Backpack.getInstance().getDataConfig());
@@ -128,7 +137,6 @@ public class InventoryEventListener implements Listener {
                 }
             }
         }
-
         //判断是否是目标背包
         if (!title.contains("§a背包")) {
             return;
@@ -177,7 +185,6 @@ public class InventoryEventListener implements Listener {
                 returnInvItems(inventory, player, path);
             }
         }
-        player.removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
     }
 
     @EventHandler
@@ -204,10 +211,7 @@ public class InventoryEventListener implements Listener {
                     mainGUI.CreateMainInventory(player);
                     Bukkit.getScheduler().runTaskLater(Backpack.getInstance(), () -> {
                         if (player.getOpenInventory().getTitle().equals("§d背包选择")) {
-                            // 自动选择第一个非空背包
-                            singleBackpack.SyncSingleBackpack(player, firstNonEmptyBackpack);
                             player.closeInventory();
-                            player.sendMessage(fileUtils.getCloseSyncInvTip());
                         }
                     }, fileUtils.getCloseSyncInvTime() * 20L);
                 }, fileUtils.getSyncTime() * 20L);
@@ -319,13 +323,30 @@ public class InventoryEventListener implements Listener {
         return -1;
     }
 
-    public boolean checkEmptyInventory(Inventory inventory) {
+    private boolean checkEmptyInventory(Inventory inventory) {
         for (int slot = 0; slot < 36; slot++) {
             ItemStack item = inventory.getItem(slot);
-            if (item == null || item.getType() == Material.AIR) {
-                return true;
+            if (item != null && item.getType() != Material.AIR) {
+                return false;
             }
         }
-        return false;
+        return true;
+    }
+
+    private void clearTargetLore(Inventory inventory) {
+        for (int slot = 0; slot < 36; slot++) {
+            ItemStack item = inventory.getItem(slot);
+            if (item != null && item.getType() != Material.AIR) {
+                ItemMeta meta = item.getItemMeta();
+                if (meta!=null&&meta.hasLore()) {
+                    List<String> itemLore = meta.getLore();
+                    if(itemLore!=null&& itemLore.contains("§b§l背包物品")){
+                        itemLore.remove("§b§l背包物品");
+                        meta.setLore(itemLore);
+                        item.setItemMeta(meta);
+                    }
+                }
+            }
+        }
     }
 }

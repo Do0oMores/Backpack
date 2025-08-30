@@ -23,7 +23,9 @@ public class MainGUI {
 
     FileUtils fileUtils = new FileUtils();
     final String separatorLine = "§7§m§e§m-§e§m-§6§m-§6§m-§8§m--------§6§m-§6§m-§e§m-§e§m-§7§m§m";
-    final FileConfiguration data = Backpack.getInstance().getDataConfig();
+    private FileConfiguration getData() {
+        return Backpack.getInstance().getDataConfig();
+    }
 
     /**
      * 构建主背包内的物品
@@ -58,7 +60,7 @@ public class MainGUI {
             loreList.add(separatorLine);
 
             // 读取 data.yml 文件中的背包数据
-            List<Map<?, ?>> backpackItems = data.getMapList(playerName + ".Backpack" + i + ".items");
+            List<Map<?, ?>> backpackItems = getData().getMapList(playerName + ".Backpack" + i + ".items");
 
             // 如果背包为空，则显示“该背包为空”
             if (backpackItems.isEmpty()) {

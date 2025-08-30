@@ -42,6 +42,10 @@ public class FileUtils {
         Backpack.getInstance().saveDataFile();
     }
 
+    /**
+     *
+     * @return 可编辑的世界
+     */
     private List<String> getEditWorlds() {
         return getConfig().getStringList("可编辑的世界");
     }
@@ -50,6 +54,10 @@ public class FileUtils {
         return getEditWorlds().contains(WorldName);
     }
 
+    /**
+     *
+     * @return 同步背包的世界
+     */
     private List<String> getSyncWorlds() {
         return getConfig().getStringList("同步背包的世界");
     }
@@ -58,6 +66,10 @@ public class FileUtils {
         return getSyncWorlds().contains(WorldName);
     }
 
+    /**
+     *
+     * @return 清除背包的世界.世界列表
+     */
     public List<String> getDelPlayerInventoryWorld(){
         return getConfig().getStringList("清除背包的世界.世界列表");
     }
@@ -118,6 +130,10 @@ public class FileUtils {
         return getConfig().getBoolean("清除背包的世界.是否启用");
     }
 
+    /**
+     *
+     * @return 同步背包自动关闭时间
+     */
     public Integer getCloseSyncInvTime(){
         return getConfig().getInt("同步背包自动关闭时间");
     }

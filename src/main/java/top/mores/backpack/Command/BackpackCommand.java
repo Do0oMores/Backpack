@@ -59,7 +59,7 @@ public class BackpackCommand implements CommandExecutor {
         
         // 检查物品是否存在
         if (Backpack.getInstance().getDataConfig().contains(path)) {
-            List<Map<?, ?>> itemData = Backpack.getInstance().getDataConfig().getMapList(path);
+            List<Map<?,?>> itemData = Backpack.getInstance().getDataConfig().getMapList(path);
             
             if (!itemData.isEmpty()) {
                 // 更新第一个物品的数量
