@@ -72,8 +72,8 @@ public class InventoryEventListener implements Listener {
             singleBackpack.SyncSingleBackpack((Player) player, slot);
             player.sendMessage(fileUtils.getSyncSuccessTip()
                     .replace("%slot%", String.valueOf(slot)));
-            Bukkit.getScheduler().runTaskLater(Backpack.getInstance(), player::closeInventory,10L);
             event.setCancelled(true);
+            Bukkit.getScheduler().runTaskLater(Backpack.getInstance(), player::closeInventory,10L);
             return;
         }
 
