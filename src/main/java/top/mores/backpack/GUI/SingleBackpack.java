@@ -91,7 +91,6 @@ public class SingleBackpack {
                 for (ItemStack item : items) {
                     inventory.setItem(inventory.firstEmpty(), item);
                 }
-                
                 // 发放默认盔甲套装
                 ArmorUtil.equipDefaultArmor(player);
             });

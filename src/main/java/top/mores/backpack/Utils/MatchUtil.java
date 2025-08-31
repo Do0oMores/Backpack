@@ -69,7 +69,7 @@ public class MatchUtil {
                 Bukkit.getScheduler().runTask(Backpack.getInstance(), () -> {
                     Inventory inventory = player.getInventory();
                     itemsToReturn.forEach(item -> {
-                        int slot=getFirstEmptyInMainInventory(inventory);
+                        int slot = getFirstEmptyInMainInventory(inventory);
                         if (slot == -1) {
                             player.getWorld().dropItemNaturally(player.getLocation(), item);
                         } else {

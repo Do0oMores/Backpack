@@ -1,5 +1,5 @@
 name: Backpack
-version: '2.3.4-hotfix'
+version: '2.3.7-fix'
 main: top.mores.backpack.Backpack
 api-version: '1.18'
 authors: [Mores, Harry_H2O]

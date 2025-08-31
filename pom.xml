@@ -6,7 +6,7 @@
 
   <groupId>top.mores</groupId>
   <artifactId>Backpack</artifactId>
-  <version>2.3.7</version>
+  <version>2.3.7-fix</version>
   <packaging>jar</packaging>
 
   <name>Backpack</name>
