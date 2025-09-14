@@ -106,4 +106,9 @@ public class MainGUI {
                 false, false,true));
         player.openInventory(MainInventory);
     }
+
+    public void CreateSaveGUI(Player player) {
+        Inventory saveGUI=Bukkit.createInventory(player,54,"§a保存数据");
+        player.openInventory(saveGUI);
+    }
 }

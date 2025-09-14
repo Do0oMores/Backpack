@@ -18,7 +18,10 @@ public class BackpackCommand implements CommandExecutor {
     MatchUtil matchUtil = new MatchUtil();
 
     @Override
-    public boolean onCommand(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String s, @NotNull String[] strings) {
+    public boolean onCommand(@NotNull CommandSender commandSender,
+                             @NotNull Command command,
+                             @NotNull String s,
+                             @NotNull String[] strings) {
         if (commandSender instanceof Player sender) {
             //打开背包
             if (strings.length == 1 && strings[0].equals("open")) {
@@ -46,6 +49,10 @@ public class BackpackCommand implements CommandExecutor {
                     } catch (NumberFormatException e) {
                         commandSender.sendMessage("数量必须是整数！");
                     }
+                }
+            }else if (strings.length==2&&strings[0].equals("savegui")){
+                if (commandSender.isOp()) {
+                    mainGUI.CreateSaveGUI(sender);
                 }
             }
         } else {

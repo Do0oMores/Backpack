@@ -9,6 +9,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import top.mores.backpack.Backpack;
 
 import java.util.*;
+import java.util.stream.Stream;
 
 public class MatchUtil {
 
@@ -51,6 +52,23 @@ public class MatchUtil {
                         }
                     })
                     .flatMap(Arrays::stream)
+                    .flatMap(item -> {
+                        if (item.getAmount() <= 127) {
+                            return Stream.of(item);
+                        } else {
+                            List<ItemStack> splitItems = new ArrayList<>();
+                            int remaining = item.getAmount();
+
+                            while (remaining > 0) {
+                                ItemStack stack = item.clone();
+                                int amount = Math.min(remaining, 127);
+                                stack.setAmount(amount);
+                                splitItems.add(stack);
+                                remaining -= amount;
+                            }
+                            return splitItems.stream();
+                        }
+                    })
                     .peek(item -> {
                         // 为发放的物品添加背包标识
                         ItemMeta meta = item.getItemMeta();
@@ -65,6 +83,7 @@ public class MatchUtil {
                         }
                     })
                     .toList();
+
             if (!itemsToReturn.isEmpty()) {
                 Bukkit.getScheduler().runTask(Backpack.getInstance(), () -> {
                     Inventory inventory = player.getInventory();

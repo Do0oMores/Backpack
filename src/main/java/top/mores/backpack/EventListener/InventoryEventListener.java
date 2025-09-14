@@ -94,17 +94,15 @@ public class InventoryEventListener implements Listener {
         // 检查是否在需要清除背包的世界
         if (fileUtils.getEnableClearInv() && fileUtils.getDelPlayerInventoryWorld().contains(worldName)) {
             // 清除玩家背包中的背包物品
-            Bukkit.getScheduler().runTaskLater(Backpack.getInstance(), () -> {
-                ItemStackUtil.removeBackpackItems(player.getInventory());
-            }, 20L); // 延迟1 tick确保死亡事件处理完成
+            Bukkit.getScheduler().runTaskLater(Backpack.getInstance(), () ->
+                    ItemStackUtil.removeBackpackItems(player.getInventory()), 20L); // 延迟1 秒确保死亡事件处理完成
         }
         
         // 检查是否在同步世界中
         if (fileUtils.isInSyncWorlds(worldName)) {
             // 延迟打开背包选择界面
-            Bukkit.getScheduler().runTaskLater(Backpack.getInstance(), () -> {
-                mainGUI.CreateMainInventory(player);
-            }, 20L); // 延迟1秒确保玩家完全死亡并重生
+            Bukkit.getScheduler().runTaskLater(Backpack.getInstance(),
+                    () -> mainGUI.CreateMainInventory(player), 2L); // 延迟1tick
         }
     }
 
@@ -194,7 +192,8 @@ public class InventoryEventListener implements Listener {
         String NowWorldName = player.getWorld().getName();
         if (fileUtils.getEnableClearInv()) {
             if (fileUtils.getDelPlayerInventoryWorld().contains(changeWorldName)) {
-                Bukkit.getScheduler().runTaskLater(Backpack.getInstance(), () -> ItemStackUtil.removeBackpackItems(player.getInventory()), 20L);
+                Bukkit.getScheduler().runTaskLater(Backpack.getInstance(), () ->
+                        ItemStackUtil.removeBackpackItems(player.getInventory()), 20L);
             }
         }
         if (fileUtils.isInSyncWorlds(NowWorldName)) {

@@ -18,13 +18,15 @@ public final class Backpack extends JavaPlugin {
     public static Backpack instance;
     public FileConfiguration config;
     public FileConfiguration data;
+    public FileConfiguration systemData;
     private File configFile;
     private File dataFile;
+    private File systemDataFile;
 
     @Override
     public void onEnable() {
         instance = this;
-        initFiles();// 添加这行来自动更新配置文件
+        initFiles();
 
         MainGUI mainGUI = new MainGUI();
         this.getServer().getPluginManager().registerEvents(new InventoryEventListener(mainGUI), this);
@@ -78,6 +80,17 @@ public final class Backpack extends JavaPlugin {
         return data;
     }
 
+    public  void reloadSystemData() {
+        systemData = YamlConfiguration.loadConfiguration(systemDataFile);
+    }
+
+    public FileConfiguration getSystemDataConfig() {
+        if (systemData == null) {
+            reloadSystemData();
+        }
+        return systemData;
+    }
+
     private void initFiles() {
         configFile = new File(getDataFolder(), "config.yml");
         if (!configFile.exists()) {
@@ -93,49 +106,25 @@ public final class Backpack extends JavaPlugin {
         dataFile = new File(getDataFolder(), "data.yml");
         if (!dataFile.exists()) {
             try {
-                dataFile.createNewFile();
+                if (dataFile.createNewFile()) {
+                    getLogger().info("创建data.yml成功");
+                }
             } catch (IOException e) {
                 getLogger().warning("创建data.yml失败: " + e.getMessage());
             }
         }
         reloadData();
 
-        File dataFolder = new File(getDataFolder(), "data");
-        if (!dataFolder.exists()) {
-            boolean isCreateDir = dataFolder.getParentFile().mkdirs();
-            if (!isCreateDir) {
-                getLogger().warning("创建data文件夹失败");
+        systemDataFile = new File(getDataFolder(), "systemData.yml");
+        if (!systemDataFile.exists()) {
+            try{
+                if (systemDataFile.createNewFile()){
+                    getLogger().info("创建systemData.yml成功");
+                }
+            }catch (IOException e){
+                getLogger().warning("创建systemData失败: " + e.getMessage());
             }
         }
+        reloadSystemData();
     }
-
-    // 添加配置文件自动更新方法
-//    private void updateConfig() {
-//        try {
-//            // 读取插件jar中的默认配置文件
-//            InputStream defaultConfigStream = getResource("config.yml");
-//            if (defaultConfigStream != null) {
-//                YamlConfiguration defaultConfig = YamlConfiguration.loadConfiguration(new InputStreamReader(defaultConfigStream));
-//
-//                // 检查并更新配置项
-//                boolean updated = false;
-//
-//                // 检查每个默认配置项是否存在
-//                for (String key : defaultConfig.getKeys(true)) {
-//                    if (!config.contains(key)) {
-//                        config.set(key, defaultConfig.get(key));
-//                        updated = true;
-//                    }
-//                }
-//
-//                // 如果有更新，保存配置文件
-//                if (updated) {
-//                    config.save(configFile);
-//                    getLogger().info("配置文件已自动更新");
-//                }
-//            }
-//        } catch (Exception e) {
-//            getLogger().warning("自动更新配置文件时出错: " + e.getMessage());
-//        }
-//    }
 }

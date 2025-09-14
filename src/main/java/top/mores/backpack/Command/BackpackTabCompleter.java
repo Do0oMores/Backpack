@@ -30,6 +30,7 @@ public class BackpackTabCompleter implements TabCompleter {
                     completions.add("save");
                     completions.add("armor");
                     completions.add("set");
+                    completions.add("savegui");
                 }
                 // 根据已输入的内容过滤
                 return filterCompletions(completions, args[0]);
