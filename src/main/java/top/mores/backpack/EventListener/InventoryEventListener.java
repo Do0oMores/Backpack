@@ -3,6 +3,7 @@ package top.mores.backpack.EventListener;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
@@ -60,7 +61,7 @@ public class InventoryEventListener implements Listener {
             event.setCancelled(true);
             return;
         }
-        slot +=1;
+        slot += 1;
         // 检查背包编号是否在允许的范围内
         if (slot > fileUtils.getBackpackAmount()) {
             event.setCancelled(true);
@@ -73,7 +74,7 @@ public class InventoryEventListener implements Listener {
             player.sendMessage(fileUtils.getSyncSuccessTip()
                     .replace("%slot%", String.valueOf(slot)));
             event.setCancelled(true);
-            Bukkit.getScheduler().runTaskLater(Backpack.getInstance(), player::closeInventory,10L);
+            Bukkit.getScheduler().runTaskLater(Backpack.getInstance(), player::closeInventory, 10L);
             return;
         }
 
@@ -90,14 +91,14 @@ public class InventoryEventListener implements Listener {
     public void onPlayerDeath(PlayerDeathEvent event) {
         Player player = event.getEntity();
         String worldName = player.getWorld().getName();
-        
+
         // 检查是否在需要清除背包的世界
         if (fileUtils.getEnableClearInv() && fileUtils.getDelPlayerInventoryWorld().contains(worldName)) {
             // 清除玩家背包中的背包物品
             Bukkit.getScheduler().runTaskLater(Backpack.getInstance(), () ->
                     ItemStackUtil.removeBackpackItems(player.getInventory()), 20L); // 延迟1 秒确保死亡事件处理完成
         }
-        
+
         // 检查是否在同步世界中
         if (fileUtils.isInSyncWorlds(worldName)) {
             // 延迟打开背包选择界面
@@ -119,7 +120,7 @@ public class InventoryEventListener implements Listener {
 
         player.removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
         if ("§d背包选择".equals(title)) {
-            if (checkEmptyInventory(player.getInventory())){
+            if (checkEmptyInventory(player.getInventory())) {
                 if (fileUtils.isInSyncWorlds(player.getWorld().getName())) {
                     int firstNonEmptyBackpack = getFirstNonEmptyBackpack(
                             player.getName(), Backpack.getInstance().getDataConfig());
@@ -197,12 +198,22 @@ public class InventoryEventListener implements Listener {
             }
         }
         if (fileUtils.isInSyncWorlds(NowWorldName)) {
+            World nowWorld = Bukkit.getWorld(NowWorldName);
+            //解析世界中所有玩家
+            List<Player> onWorldPlayers = null;
+            if (nowWorld != null) {
+                onWorldPlayers = nowWorld.getPlayers();
+            }
             int firstNonEmptyBackpack = getFirstNonEmptyBackpack(
                     player.getName(), Backpack.getInstance().getDataConfig());
             if (firstNonEmptyBackpack == -1) {
                 String command = fileUtils.getNotAllowedRunCommand();
                 if (command != null && !command.isEmpty()) {
-                    Bukkit.dispatchCommand(player, command);
+                    if (onWorldPlayers != null) {
+                        for (Player player1 : onWorldPlayers) {
+                            Bukkit.dispatchCommand(player1, command);
+                        }
+                    }
                 }
                 player.sendMessage(fileUtils.getEmptyBPTip());
             } else {
@@ -222,7 +233,7 @@ public class InventoryEventListener implements Listener {
     public void onPlayerRespawn(PlayerRespawnEvent event) {
         Player player = event.getPlayer();
         String worldName = player.getWorld().getName();
-        
+
         // 检查是否在同步世界中
         if (fileUtils.isInSyncWorlds(worldName)) {
             // 增加延迟打开背包选择界面，确保玩家完全重生
@@ -306,7 +317,7 @@ public class InventoryEventListener implements Listener {
         for (int i = 1; i <= number; i++) {
             String path = playerName + ".Backpack" + i + ".items";
             Object value = dataConfig.get(path);
-    
+
             if (value == null) {
                 continue;
             }
@@ -337,9 +348,9 @@ public class InventoryEventListener implements Listener {
             ItemStack item = inventory.getItem(slot);
             if (item != null && item.getType() != Material.AIR) {
                 ItemMeta meta = item.getItemMeta();
-                if (meta!=null&&meta.hasLore()) {
+                if (meta != null && meta.hasLore()) {
                     List<String> itemLore = meta.getLore();
-                    if(itemLore!=null&& itemLore.contains("§b§l背包物品")){
+                    if (itemLore != null && itemLore.contains("§b§l背包物品")) {
                         itemLore.remove("§b§l背包物品");
                         meta.setLore(itemLore);
                         item.setItemMeta(meta);
