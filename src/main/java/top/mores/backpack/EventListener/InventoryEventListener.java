@@ -19,6 +19,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import top.mores.backpack.Backpack;
 import top.mores.backpack.GUI.MainGUI;
@@ -119,6 +120,10 @@ public class InventoryEventListener implements Listener {
         }
 
         player.removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
+        //清除无敌后再给予3秒无敌时间
+        player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE,
+                20 * 3, 255,
+                false, false,true));
         if ("§d背包选择".equals(title)) {
             if (checkEmptyInventory(player.getInventory())) {
                 if (fileUtils.isInSyncWorlds(player.getWorld().getName())) {
