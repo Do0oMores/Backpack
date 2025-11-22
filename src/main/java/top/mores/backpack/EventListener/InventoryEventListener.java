@@ -133,8 +133,10 @@ public class InventoryEventListener implements Listener {
                         singleBackpack.SyncSingleBackpack(player, firstNonEmptyBackpack);
                         player.sendMessage(fileUtils.getCloseSyncInvTip());
                     } else {
-                        String command = fileUtils.getNotAllowedRunCommand();
-                        if (command != null && !command.isEmpty()) {
+                        //关闭空背包执行命令
+                        String command = fileUtils.getEmptyBPRunCommand()
+                                .replace("%player%", player.getName());
+                        if (!command.isEmpty()) {
                             Bukkit.dispatchCommand(player, command);
                         }
                     }
@@ -212,16 +214,19 @@ public class InventoryEventListener implements Listener {
             int firstNonEmptyBackpack = getFirstNonEmptyBackpack(
                     player.getName(), Backpack.getInstance().getDataConfig());
             if (firstNonEmptyBackpack == -1) {
-                String command = fileUtils.getNotAllowedRunCommand();
-                if (command != null && !command.isEmpty()) {
+                List<String> commands = fileUtils.getNotAllowedRunCommand();
+                if (commands != null && !commands.isEmpty()) {
                     if (onWorldPlayers != null) {
                         for (Player player1 : onWorldPlayers) {
-                            Bukkit.dispatchCommand(player1, command);
+                            for (String cmd : commands) {
+                                String finalCmd = cmd.replace("%player%", player1.getName());
+                                Bukkit.dispatchCommand(player1, finalCmd);
+                            }
                         }
                     }
                 }
                 player.sendMessage(fileUtils.getEmptyBPTip());
-            } else {
+            }else {
                 Bukkit.getScheduler().runTaskLater(Backpack.getInstance(), () -> {
                     mainGUI.CreateMainInventory(player);
                     Bukkit.getScheduler().runTaskLater(Backpack.getInstance(), () -> {
@@ -246,8 +251,9 @@ public class InventoryEventListener implements Listener {
                 int firstNonEmptyBackpack = getFirstNonEmptyBackpack(
                         player.getName(), Backpack.getInstance().getDataConfig());
                 if (firstNonEmptyBackpack == -1) {
-                    String command = fileUtils.getNotAllowedRunCommand();
-                    if (command != null && !command.isEmpty()) {
+                    String command = fileUtils.getEmptyBPRunCommand()
+                            .replace("%player%", player.getName());
+                    if (!command.isEmpty()) {
                         Bukkit.dispatchCommand(player, command);
                     }
                     player.sendMessage(fileUtils.getEmptyBPTip());

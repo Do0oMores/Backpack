@@ -142,8 +142,12 @@ public class FileUtils {
         return getConfig().getString("同步背包自动选择提示");
     }
 
-    public String getNotAllowedRunCommand(){
-        return getConfig().getString("空背包执行命令");
+    public List<String> getNotAllowedRunCommand(){
+        return getConfig().getStringList("空背包执行命令");
+    }
+
+    public String getEmptyBPRunCommand(){
+        return getConfig().getString("关闭空背包执行命令");
     }
 
     public String getEmptyBPTip(){
