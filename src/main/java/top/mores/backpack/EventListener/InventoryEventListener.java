@@ -225,7 +225,7 @@ public class InventoryEventListener implements Listener {
                         }
                     }
                 }
-                player.sendMessage(fileUtils.getEmptyBPTip());
+                player.sendMessage(fileUtils.getEmptyBPTip().replace("%player%", player.getName()));
             }else {
                 Bukkit.getScheduler().runTaskLater(Backpack.getInstance(), () -> {
                     mainGUI.CreateMainInventory(player);
