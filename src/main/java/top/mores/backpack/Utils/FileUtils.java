@@ -143,7 +143,7 @@ public class FileUtils {
     }
 
     public List<String> getNotAllowedRunCommand(){
-        return getConfig().getStringList("空背包执行命令");
+        return getConfig().getStringList("控制台空背包执行命令");
     }
 
     public String getEmptyBPRunCommand(){
@@ -156,5 +156,13 @@ public class FileUtils {
 
     public Integer getSyncTime(){
         return getConfig().getInt("延迟同步背包的时间");
+    }
+
+    public List<String> getEmptyCommandToPlayer(){
+        return getConfig().getStringList("玩家空背包执行命令");
+    }
+
+    public  String getEmptyCommand(){
+        return getConfig().getString("空背包玩家执行命令");
     }
 }

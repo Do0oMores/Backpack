@@ -199,7 +199,7 @@ public class InventoryEventListener implements Listener {
         Player player = event.getPlayer();
         String NowWorldName = player.getWorld().getName();
         if (fileUtils.getEnableClearInv()) {
-            if (fileUtils.getDelPlayerInventoryWorld().contains(changeWorldName)) {
+            if (fileUtils.getDelPlayerInventoryWorld().contains(NowWorldName)) {
                 Bukkit.getScheduler().runTaskLater(Backpack.getInstance(), () ->
                         ItemStackUtil.removeBackpackItems(player.getInventory()), 20L);
             }
@@ -214,18 +214,31 @@ public class InventoryEventListener implements Listener {
             int firstNonEmptyBackpack = getFirstNonEmptyBackpack(
                     player.getName(), Backpack.getInstance().getDataConfig());
             if (firstNonEmptyBackpack == -1) {
-                List<String> commands = fileUtils.getNotAllowedRunCommand();
-                if (commands != null && !commands.isEmpty()) {
+                List<String> commandsConsole = fileUtils.getNotAllowedRunCommand();
+                List<String> commandsPlayer=fileUtils.getEmptyCommandToPlayer();
+                String command=fileUtils.getEmptyCommand().replace("%EmptyPlayer%",player.getName());
+                if (commandsConsole != null && !commandsConsole.isEmpty()) {
                     if (onWorldPlayers != null) {
                         for (Player player1 : onWorldPlayers) {
-                            for (String cmd : commands) {
-                                String finalCmd = cmd.replace("%player%", player1.getName());
-                                Bukkit.dispatchCommand(player1, finalCmd);
+                            for (String cmd : commandsConsole) {
+                                // %player% = 当前世界所有的玩家ID
+                                // 空背包玩家ID：%EmptyPlayer%
+                                String finalCmd = cmd.replace("%player%", player1.getName())
+                                        .replace("%EmptyPlayer%",player.getName());
+                                Bukkit.dispatchCommand(Bukkit.getConsoleSender(), finalCmd);
+                            }
+                            if (!player1.getUniqueId().equals(player.getUniqueId())) {
+                                for (String cmd : commandsPlayer) {
+                                    String finalCmd = cmd.replace("%player%", player1.getName())
+                                            .replace("%EmptyPlayer%",player.getName());
+                                    Bukkit.dispatchCommand(player1, finalCmd);
+                                }
+                            }else {
+                                Bukkit.dispatchCommand(player,command);
                             }
                         }
                     }
                 }
-                player.sendMessage(fileUtils.getEmptyBPTip().replace("%player%", player.getName()));
             }else {
                 Bukkit.getScheduler().runTaskLater(Backpack.getInstance(), () -> {
                     mainGUI.CreateMainInventory(player);
