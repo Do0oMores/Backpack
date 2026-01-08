@@ -15,10 +15,10 @@ import java.util.Objects;
 
 public final class Backpack extends JavaPlugin {
 
-    public static Backpack instance;
-    public FileConfiguration config;
-    public FileConfiguration data;
-    public FileConfiguration systemData;
+    private static Backpack instance;
+    private FileConfiguration config;
+    private FileConfiguration data;
+    private FileConfiguration systemData;
     private File configFile;
     private File dataFile;
     private File systemDataFile;
@@ -80,11 +80,11 @@ public final class Backpack extends JavaPlugin {
         return data;
     }
 
-    public  void reloadSystemData() {
+    private void reloadSystemData() {
         systemData = YamlConfiguration.loadConfiguration(systemDataFile);
     }
 
-    public FileConfiguration getSystemDataConfig() {
+    private FileConfiguration getSystemDataConfig() {
         if (systemData == null) {
             reloadSystemData();
         }
