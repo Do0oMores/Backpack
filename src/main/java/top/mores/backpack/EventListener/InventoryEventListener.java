@@ -120,9 +120,9 @@ public class InventoryEventListener implements Listener {
         }
 
         player.removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
-        //清除无敌后再给予3秒无敌时间
+        //清除无敌后再给予无敌时间
         player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE,
-                20 * 3, 255,
+                20 * fileUtils.getHarmlessTime(), 255,
                 false, false,true));
         if ("§d背包选择".equals(title)) {
             if (checkEmptyInventory(player.getInventory())) {

@@ -165,4 +165,8 @@ public class FileUtils {
     public  String getEmptyCommand(){
         return getConfig().getString("空背包玩家执行命令");
     }
+
+    public Integer getHarmlessTime(){
+        return getConfig().getInt("关闭背包后的无敌时间");
+    }
 }
