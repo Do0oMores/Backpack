@@ -8,8 +8,10 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
@@ -29,6 +31,7 @@ import top.mores.backpack.Utils.ItemStackUtil;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class InventoryEventListener implements Listener {
 
@@ -47,22 +50,24 @@ public class InventoryEventListener implements Listener {
         fileUtils.initPLayerMainInventoryData(player);
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGH)
     public void onPlayerClickInventory(InventoryClickEvent event) {
         InventoryView inventoryView = event.getView();
         HumanEntity player = event.getWhoClicked();
         String inventoryTitle = inventoryView.getTitle();
 
         // 判断是否是创建的背包
-        if (!"§d背包选择".equals(inventoryTitle)) {
+        if (!"§d背包选择".equals(inventoryTitle) && !inventoryTitle.matches("§a背包\\d+")) {
             return;
         }
+
         int slot = event.getSlot();
         if (slot < 0 || slot >= event.getInventory().getSize()) {
             event.setCancelled(true);
             return;
         }
         slot += 1;
+
         // 检查背包编号是否在允许的范围内
         if (slot > fileUtils.getBackpackAmount()) {
             event.setCancelled(true);
@@ -86,7 +91,56 @@ public class InventoryEventListener implements Listener {
         } else {
             player.sendMessage(fileUtils.getEditBPERROR());
         }
+
+        if (slot >= 9 && slot <= 17) {
+            ItemStack clickItem = event.getCurrentItem();
+            if (hasLockLore(clickItem)) {
+                event.setCancelled(true);
+                return;
+            }
+
+            ItemStack cursorItem = event.getCursor();
+            if (hasLockLore(cursorItem)) {
+                event.setCancelled(true);
+                return;
+            }
+
+            // 移动到其他背包的操作
+            if (event.getAction() == InventoryAction.MOVE_TO_OTHER_INVENTORY) {
+                ItemStack movedItem = event.getCurrentItem();
+                if (hasLockLore(movedItem)) {
+                    event.setCancelled(true);
+                    return;
+                }
+            }
+
+            // 快捷栏交换的操作
+            if (event.getAction() == InventoryAction.SWAP_WITH_CURSOR) {
+                ItemStack hotbarItem = null;
+                if (event.getHotbarButton() >= 0) {
+                    hotbarItem = player.getInventory().getItem(event.getHotbarButton());
+                }
+                if ((hasLockLore(clickItem)) || (hasLockLore(hotbarItem))) {
+                    event.setCancelled(true);
+                    return;
+                }
+            }
+
+            // 快捷栏移动操作
+            if (event.getAction() == InventoryAction.HOTBAR_SWAP ||
+                    event.getAction() == InventoryAction.HOTBAR_MOVE_AND_READD) {
+                int hotbarSlot = event.getHotbarButton();
+                if (hotbarSlot >= 0) {
+                    ItemStack hotbarItem = player.getInventory().getItem(hotbarSlot);
+                    if (hasLockLore(hotbarItem)) {
+                        event.setCancelled(true);
+                        return;
+                    }
+                }
+            }
+        }
     }
+
 
     @EventHandler
     public void onPlayerDeath(PlayerDeathEvent event) {
@@ -123,7 +177,7 @@ public class InventoryEventListener implements Listener {
         //清除无敌后再给予无敌时间
         player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE,
                 20 * fileUtils.getHarmlessTime(), 255,
-                false, false,true));
+                false, false, true));
         if ("§d背包选择".equals(title)) {
             if (checkEmptyInventory(player.getInventory())) {
                 if (fileUtils.isInSyncWorlds(player.getWorld().getName())) {
@@ -195,7 +249,7 @@ public class InventoryEventListener implements Listener {
 
     @EventHandler
     public void onPlayerChangeWorld(PlayerChangedWorldEvent event) {
-        String changeWorldName = event.getFrom().getName();
+        //String changeWorldName = event.getFrom().getName();
         Player player = event.getPlayer();
         String NowWorldName = player.getWorld().getName();
         if (fileUtils.getEnableClearInv()) {
@@ -342,8 +396,10 @@ public class InventoryEventListener implements Listener {
         Backpack.getInstance().saveDataFile();
     }
 
+    //只取第一行物品
     public List<Map<String, Object>> getInvItems(Inventory inventory) {
-        return Arrays.stream(inventory.getContents())
+        return IntStream.range(0, Math.min(9, inventory.getSize()))
+                .mapToObj(inventory::getItem)
                 .filter(Objects::nonNull)
                 .map(ItemStackUtil::getItemStackMap)
                 .toList();
@@ -395,5 +451,34 @@ public class InventoryEventListener implements Listener {
                 }
             }
         }
+    }
+
+    // 检查物品lore是否包含lock
+    private boolean hasLockLore(ItemStack item) {
+        if (item == null || !item.hasItemMeta()) {
+            return false;
+        }
+
+        if (item.getType().equals(Material.AIR)) {
+            return false;
+        }
+
+        ItemMeta meta = item.getItemMeta();
+        if (!meta.hasLore()) {
+            return false;
+        }
+
+        List<String> lore = meta.getLore();
+        if (lore == null || lore.isEmpty()) {
+            return false;
+        }
+
+        for (String line : lore) {
+            if (ChatColor.stripColor(line).toLowerCase().contains("lock")) {
+                Bukkit.getServer().getLogger().warning("存在lore");
+                return true;
+            }
+        }
+        return false;
     }
 }
