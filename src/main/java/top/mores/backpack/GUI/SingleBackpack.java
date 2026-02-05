@@ -13,9 +13,8 @@ import top.mores.backpack.Backpack;
 import top.mores.backpack.Utils.ItemStackUtil;
 import top.mores.backpack.Utils.MatchUtil;
 import top.mores.backpack.Utils.ArmorUtil;
-import top.mores.backpack.Utils.MessageUtil;
+import top.mores.backpack.Utils.ConfigOperation.MessageUtil;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 

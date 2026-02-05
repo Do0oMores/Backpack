@@ -1,4 +1,4 @@
-package top.mores.backpack.Utils;
+package top.mores.backpack.Utils.ConfigOperation;
 
 import org.bukkit.configuration.file.FileConfiguration;
 import top.mores.backpack.Backpack;

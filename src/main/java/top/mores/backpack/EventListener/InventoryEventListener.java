@@ -26,7 +26,7 @@ import top.mores.backpack.GUI.MainBPHolder;
 import top.mores.backpack.GUI.SingleBPHolder;
 import top.mores.backpack.GUI.MainGUI;
 import top.mores.backpack.GUI.SingleBackpack;
-import top.mores.backpack.Utils.FileUtils;
+import top.mores.backpack.Utils.ConfigOperation.FileUtils;
 import top.mores.backpack.Utils.ItemStackUtil;
 
 import java.util.*;

@@ -11,7 +11,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import top.mores.backpack.Backpack;
 import top.mores.backpack.EventListener.ProtectionManager;
 import top.mores.backpack.Utils.ChatColorUtil;
-import top.mores.backpack.Utils.FileUtils;
+import top.mores.backpack.Utils.ConfigOperation.FileUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
