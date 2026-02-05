@@ -95,7 +95,8 @@ public class MainGUI {
      */
     public void CreateMainInventory(Player player) {
         MainBPHolder holder = new MainBPHolder(player.getUniqueId());
-        Inventory MainInventory = Bukkit.createInventory(holder, 9, "§d背包选择");
+        Inventory MainInventory = Bukkit.createInventory(holder, 9,
+                ChatColor.translateAlternateColorCodes('&', fileUtils.getMainGUITitle()));
         int index = MainInventory.firstEmpty();
         if (index != -1) {
             for (ItemStack item : MainInventoryItem(player.getName())) {

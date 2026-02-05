@@ -166,4 +166,8 @@ public class FileUtils {
     public Integer getHarmlessTime() {
         return getConfig().getInt("关闭背包后的无敌时间");
     }
+
+    public String getMainGUITitle() {
+        return getConfig().getString("主背包GUI标题");
+    }
 }

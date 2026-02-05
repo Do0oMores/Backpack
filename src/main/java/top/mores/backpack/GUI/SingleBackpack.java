@@ -1,6 +1,7 @@
 package top.mores.backpack.GUI;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
@@ -46,7 +47,9 @@ public class SingleBackpack {
     public void CreateSingleInventory(Player player, int slot) {
         SingleBPHolder holder = new SingleBPHolder(player.getUniqueId());
         //背包格式：两行物品栏
-        Inventory singleInventory = Bukkit.createInventory(holder, 18, "§a背包" + slot);
+        Inventory singleInventory = Bukkit.createInventory(holder, 18,
+                ChatColor.translateAlternateColorCodes('&',
+                        messageUtil.getOtherGUITitle())+ slot);
         for (ItemStack item : SingleBackpackItems(player.getName(), slot)) {
             singleInventory.setItem(singleInventory.firstEmpty(), item);
         }
@@ -133,25 +136,29 @@ public class SingleBackpack {
     //创建背包物品
     private ItemStack createGUIItem(Material material,
                                     String name,
-                                    String lore,
+                                    List<String> lore,
                                     boolean unbreakable) {
+
         ItemStack item = new ItemStack(material);
         ItemMeta meta = item.getItemMeta();
 
-        if (meta != null) {
-            meta.setDisplayName(name);
-            if (lore != null && !lore.isEmpty()) {
-                meta.setLore(Arrays.asList(lore.split("\n")));
-            }
+        if (meta == null) return item;
+        meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', name));
 
-            if (unbreakable) {
-                meta.setUnbreakable(true);
-                meta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
-            }
-
-            meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
-            item.setItemMeta(meta);
+        if (lore != null && !lore.isEmpty()) {
+            meta.setLore(
+                    lore.stream()
+                            .map(line -> ChatColor.translateAlternateColorCodes('&', line))
+                            .toList()
+            );
         }
+        if (unbreakable) {
+            meta.setUnbreakable(true);
+            meta.addItemFlags(ItemFlag.HIDE_UNBREAKABLE);
+        }
+        meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+
+        item.setItemMeta(meta);
         return item;
     }
 }
