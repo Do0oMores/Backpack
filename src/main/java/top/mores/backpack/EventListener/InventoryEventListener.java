@@ -10,7 +10,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
@@ -21,8 +20,6 @@ import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.potion.PotionEffect;
-import org.bukkit.potion.PotionEffectType;
 import top.mores.backpack.Backpack;
 import top.mores.backpack.GUI.MainBPHolder;
 import top.mores.backpack.GUI.SingleBPHolder;
@@ -100,54 +97,6 @@ public class InventoryEventListener implements Listener {
         } else if (!(holder instanceof SingleBPHolder)) {
             player.sendMessage(fileUtils.getEditBPERROR());
             event.setCancelled(true);
-        }
-
-        if (slot >= 9 && slot <= 18) {
-            ItemStack clickItem = event.getCurrentItem();
-            if (hasLockLore(clickItem)) {
-                event.setCancelled(true);
-                return;
-            }
-
-            ItemStack cursorItem = event.getCursor();
-            if (hasLockLore(cursorItem)) {
-                event.setCancelled(true);
-                return;
-            }
-
-            // 移动到其他背包的操作
-            if (event.getAction() == InventoryAction.MOVE_TO_OTHER_INVENTORY) {
-                ItemStack movedItem = event.getCurrentItem();
-                if (hasLockLore(movedItem)) {
-                    event.setCancelled(true);
-                    return;
-                }
-            }
-
-            // 快捷栏交换的操作
-            if (event.getAction() == InventoryAction.SWAP_WITH_CURSOR) {
-                ItemStack hotbarItem = null;
-                if (event.getHotbarButton() >= 0) {
-                    hotbarItem = player.getInventory().getItem(event.getHotbarButton());
-                }
-                if ((hasLockLore(clickItem)) || (hasLockLore(hotbarItem))) {
-                    event.setCancelled(true);
-                    return;
-                }
-            }
-
-            // 快捷栏移动操作
-            if (event.getAction() == InventoryAction.HOTBAR_SWAP ||
-                    event.getAction() == InventoryAction.HOTBAR_MOVE_AND_READD) {
-                int hotbarSlot = event.getHotbarButton();
-                if (hotbarSlot >= 0) {
-                    ItemStack hotbarItem = player.getInventory().getItem(hotbarSlot);
-                    if (hasLockLore(hotbarItem)) {
-                        event.setCancelled(true);
-                        return;
-                    }
-                }
-            }
         }
     }
 
@@ -458,33 +407,5 @@ public class InventoryEventListener implements Listener {
                 }
             }
         }
-    }
-
-    // 检查物品lore是否包含lock
-    private boolean hasLockLore(ItemStack item) {
-        if (item == null || !item.hasItemMeta()) {
-            return false;
-        }
-
-        if (item.getType().equals(Material.AIR)) {
-            return false;
-        }
-
-        ItemMeta meta = item.getItemMeta();
-        if (!meta.hasLore()) {
-            return false;
-        }
-
-        List<String> lore = meta.getLore();
-        if (lore == null || lore.isEmpty()) {
-            return false;
-        }
-
-        for (String line : lore) {
-            if (ChatColor.stripColor(line).toLowerCase().contains("lock")) {
-                return true;
-            }
-        }
-        return false;
     }
 }
