@@ -17,14 +17,14 @@ public class BackpackTabCompleter implements TabCompleter {
     @Override
     public List<String> onTabComplete(@NotNull CommandSender sender, @NotNull Command command, @NotNull String alias, @NotNull String[] args) {
         List<String> completions = new ArrayList<>();
-        
+
         if (command.getName().equalsIgnoreCase("bp")) {
             if (args.length == 1) {
                 // 第一个参数的补全
                 if (sender instanceof Player) {
                     completions.add("open");
                 }
-                
+
                 if (sender.isOp()) {
                     completions.add("reload");
                     completions.add("save");
@@ -48,7 +48,7 @@ public class BackpackTabCompleter implements TabCompleter {
         }
         return completions;
     }
-    
+
     private List<String> filterCompletions(List<String> completions, String arg) {
         List<String> result = new ArrayList<>();
         for (String completion : completions) {

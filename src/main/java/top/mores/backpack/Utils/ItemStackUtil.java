@@ -80,11 +80,11 @@ public class ItemStackUtil {
             Map<String, Object> metaMap = null;
             if (meta != null) {
                 metaMap = new LinkedHashMap<>(meta.serialize());
-                
+
                 // 添加背包物品标识到lore（仅当不存在时）
                 List<String> lore = meta.hasLore() ? meta.getLore() : new ArrayList<>();
                 if (lore == null) lore = new ArrayList<>();
-                
+
                 // 检查是否已包含背包物品标识
                 if (!lore.contains(BACKPACK_ITEM_LORE)) {
                     lore.add(BACKPACK_ITEM_LORE);

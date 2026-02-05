@@ -8,7 +8,6 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.event.inventory.InventoryAction;
@@ -18,12 +17,15 @@ import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import top.mores.backpack.Backpack;
+import top.mores.backpack.GUI.MainBPHolder;
+import top.mores.backpack.GUI.SingleBPHolder;
 import top.mores.backpack.GUI.MainGUI;
 import top.mores.backpack.GUI.SingleBackpack;
 import top.mores.backpack.Utils.FileUtils;
@@ -50,32 +52,38 @@ public class InventoryEventListener implements Listener {
         fileUtils.initPLayerMainInventoryData(player);
     }
 
-    @EventHandler(priority = EventPriority.HIGH)
+    @EventHandler
     public void onPlayerClickInventory(InventoryClickEvent event) {
-        InventoryView inventoryView = event.getView();
+
         HumanEntity player = event.getWhoClicked();
-        String inventoryTitle = inventoryView.getTitle();
+        Inventory inventory = event.getView().getTopInventory();
+        Inventory clicked = event.getClickedInventory();
+        InventoryHolder holder = inventory.getHolder();
+        if (clicked == null) return;
 
         // 判断是否是创建的背包
-        if (!"§d背包选择".equals(inventoryTitle) && !inventoryTitle.matches("§a背包\\d+")) {
+        if (!(holder instanceof SingleBPHolder) &&
+                !clicked.equals(inventory) &&
+                !(holder instanceof MainBPHolder)) {
             return;
         }
 
-        int slot = event.getSlot();
-        if (slot < 0 || slot >= event.getInventory().getSize()) {
-            event.setCancelled(true);
+        int slot = event.getRawSlot();
+        if (slot < 0 || slot >= event.getView().getTopInventory().getSize()) {
             return;
         }
         slot += 1;
 
         // 检查背包编号是否在允许的范围内
-        if (slot > fileUtils.getBackpackAmount()) {
-            event.setCancelled(true);
-            return;
+        if (holder instanceof MainBPHolder) {
+            if (slot > fileUtils.getBackpackAmount()) {
+                return;
+            }
         }
 
         // 根据玩家所在的世界进行同步或创建
-        if (fileUtils.isInSyncWorlds(player.getWorld().getName())) {
+        if (fileUtils.isInSyncWorlds(player.getWorld().getName()) &&
+                holder instanceof MainBPHolder) {
             singleBackpack.SyncSingleBackpack((Player) player, slot);
             player.sendMessage(fileUtils.getSyncSuccessTip()
                     .replace("%slot%", String.valueOf(slot)));
@@ -85,14 +93,16 @@ public class InventoryEventListener implements Listener {
         }
 
         // 检查是否在可编辑的世界中
-        if (fileUtils.isInCanEditWorlds(player.getWorld().getName())) {
+        if (fileUtils.isInCanEditWorlds(player.getWorld().getName()) &&
+                holder instanceof MainBPHolder) {
             singleBackpack.CreateSingleInventory((Player) player, slot);
             event.setCancelled(true);
-        } else {
+        } else if (!(holder instanceof SingleBPHolder)) {
             player.sendMessage(fileUtils.getEditBPERROR());
+            event.setCancelled(true);
         }
 
-        if (slot >= 9 && slot <= 17) {
+        if (slot >= 9 && slot <= 18) {
             ItemStack clickItem = event.getCurrentItem();
             if (hasLockLore(clickItem)) {
                 event.setCancelled(true);
@@ -141,7 +151,6 @@ public class InventoryEventListener implements Listener {
         }
     }
 
-
     @EventHandler
     public void onPlayerDeath(PlayerDeathEvent event) {
         Player player = event.getEntity();
@@ -167,6 +176,8 @@ public class InventoryEventListener implements Listener {
         InventoryView inventoryView = event.getView();
         String title = inventoryView.getTitle();
         HumanEntity human = event.getPlayer();
+        Inventory topInventory = event.getView().getTopInventory();
+
         if (!(human instanceof Player player)) return;
 
         if (fileUtils.isInCanEditWorlds(player.getWorld().getName())) {
@@ -178,7 +189,7 @@ public class InventoryEventListener implements Listener {
         player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE,
                 20 * fileUtils.getHarmlessTime(), 255,
                 false, false, true));
-        if ("§d背包选择".equals(title)) {
+        if (topInventory.getHolder() instanceof MainBPHolder) {
             if (checkEmptyInventory(player.getInventory())) {
                 if (fileUtils.isInSyncWorlds(player.getWorld().getName())) {
                     int firstNonEmptyBackpack = getFirstNonEmptyBackpack(
@@ -198,39 +209,38 @@ public class InventoryEventListener implements Listener {
             }
         }
         //判断是否是目标背包
-        if (!title.contains("§a背包")) {
+        if (!(topInventory.getHolder() instanceof SingleBPHolder)) {
             return;
         }
         String playerName = player.getName();
 
-        Inventory inventory = event.getInventory();
-        int mainAmount = singleBackpack.checkItemLoreContains(inventory, fileUtils.getBPLoreLockItem().get(0));
-        int secondAmount = singleBackpack.checkItemLoreContains(inventory, fileUtils.getBPLoreLockItem().get(1));
+        int mainAmount = singleBackpack.checkItemLoreContains(topInventory, fileUtils.getBPLoreLockItem().get(0));
+        int secondAmount = singleBackpack.checkItemLoreContains(topInventory, fileUtils.getBPLoreLockItem().get(1));
         String backpackNumber = title.substring(title.lastIndexOf("背包") + 2);
         String path = playerName + ".Backpack" + backpackNumber + ".items";
 
         if (fileUtils.getEnableBPLoreLock()) {
             if (mainAmount == 1 && secondAmount == 1) {
-                List<Map<String, Object>> serializedItems = getInvItems(inventory);
+                List<Map<String, Object>> serializedItems = getInvItems(topInventory);
                 Backpack.getInstance().getDataConfig().set(path, serializedItems);
                 Backpack.getInstance().saveDataFile();
                 player.sendMessage(fileUtils.getSaveSuccessTip()
                         .replace("%number%", backpackNumber));
             } else {
                 player.sendMessage(fileUtils.getBPSaveERROR());
-                returnInvItems(inventory, player, path);
+                returnInvItems(topInventory, player, path);
             }
         }
         if (fileUtils.getEnableBPLock()) {
             Map<Integer, List<String>> loreMap = fileUtils.getBPLockItem();
-            List<Map<String, Object>> invItems = getInvItems(inventory);
+            List<Map<String, Object>> invItems = getInvItems(topInventory);
 
             if (invItems.size() > loreMap.size()) {
                 player.sendMessage(fileUtils.getMaxItemsERROR() + loreMap.size());
-                returnInvItems(inventory, player, path);
+                returnInvItems(topInventory, player, path);
                 return;
             }
-            List<Integer> invalidSlots = getInvalidSlots(inventory, loreMap);
+            List<Integer> invalidSlots = getInvalidSlots(topInventory, loreMap);
             if (invalidSlots.isEmpty()) {
                 Backpack.getInstance().getDataConfig().set(path, invItems);
                 Backpack.getInstance().saveDataFile();
@@ -242,14 +252,13 @@ public class InventoryEventListener implements Listener {
                                 .replace("%lore%", String.join(" / ", loreMap.get(slot))))
                         .collect(Collectors.joining("， "));
                 player.sendMessage(fileUtils.getNOMatchItemsERROR() + errorMsg);
-                returnInvItems(inventory, player, path);
+                returnInvItems(topInventory, player, path);
             }
         }
     }
 
     @EventHandler
     public void onPlayerChangeWorld(PlayerChangedWorldEvent event) {
-        //String changeWorldName = event.getFrom().getName();
         Player player = event.getPlayer();
         String NowWorldName = player.getWorld().getName();
         if (fileUtils.getEnableClearInv()) {
@@ -309,7 +318,7 @@ public class InventoryEventListener implements Listener {
                 Bukkit.getScheduler().runTaskLater(
                         Backpack.getInstance(),
                         () -> {
-                            if ("§d背包选择".equals(player.getOpenInventory().getTitle())) {
+                            if (player.getOpenInventory().getTopInventory() instanceof MainBPHolder) {
                                 player.closeInventory();
                             }
                         },
@@ -341,7 +350,7 @@ public class InventoryEventListener implements Listener {
                     mainGUI.CreateMainInventory(player);
                     // 设置自动关闭时间
                     Bukkit.getScheduler().runTaskLater(Backpack.getInstance(), () -> {
-                        if (player.getOpenInventory().getTitle().equals("§d背包选择")) {
+                        if (player.getOpenInventory().getTopInventory() instanceof MainBPHolder) {
                             // 自动选择第一个非空背包
                             singleBackpack.SyncSingleBackpack(player, firstNonEmptyBackpack);
                             player.closeInventory();
@@ -383,15 +392,17 @@ public class InventoryEventListener implements Listener {
         return invalidSlots;
     }
 
-    public void returnInvItems(Inventory inventory, HumanEntity player, String path) {
-        ItemStack[] contents = Arrays.stream(inventory.getContents())
-                .filter(item -> item != null && item.getType() != Material.AIR)
-                .toArray(ItemStack[]::new);
-        Map<Integer, ItemStack> remainingItems = player.getInventory().addItem(contents);
-        remainingItems.values().forEach(item ->
-                player.getWorld().dropItemNaturally(player.getLocation(), item)
-        );
-        inventory.clear();
+    public void returnInvItems(Inventory inventory, Player player, String path) {
+        for (int i = 0; i < 9; i++) {
+            ItemStack item = inventory.getItem(i);
+            if (item == null || item.getType() == Material.AIR)
+                continue;
+            HashMap<Integer, ItemStack> leftover = player.getInventory().addItem(item);
+
+            leftover.values().forEach(drop -> player.getWorld().dropItemNaturally(
+                    player.getLocation(), drop));
+            inventory.setItem(i, null);
+        }
         Backpack.getInstance().getDataConfig().set(path, null);
         Backpack.getInstance().saveDataFile();
     }
@@ -475,7 +486,6 @@ public class InventoryEventListener implements Listener {
 
         for (String line : lore) {
             if (ChatColor.stripColor(line).toLowerCase().contains("lock")) {
-                Bukkit.getServer().getLogger().warning("存在lore");
                 return true;
             }
         }

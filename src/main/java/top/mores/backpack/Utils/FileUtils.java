@@ -20,6 +20,7 @@ public class FileUtils {
 
     /**
      * 获取最大背包数量
+     *
      * @return 最大背包数量
      */
     public int getBackpackAmount() {
@@ -43,7 +44,6 @@ public class FileUtils {
     }
 
     /**
-     *
      * @return 可编辑的世界
      */
     private List<String> getEditWorlds() {
@@ -55,7 +55,6 @@ public class FileUtils {
     }
 
     /**
-     *
      * @return 同步背包的世界
      */
     private List<String> getSyncWorlds() {
@@ -67,22 +66,21 @@ public class FileUtils {
     }
 
     /**
-     *
      * @return 清除背包的世界.世界列表
      */
-    public List<String> getDelPlayerInventoryWorld(){
+    public List<String> getDelPlayerInventoryWorld() {
         return getConfig().getStringList("清除背包的世界.世界列表");
     }
 
-    public boolean getEnableBPLoreLock(){
+    public boolean getEnableBPLoreLock() {
         return getConfig().getBoolean("背包锁定物品.是否启用");
     }
 
-    public List<String> getBPLoreLockItem(){
+    public List<String> getBPLoreLockItem() {
         return getConfig().getStringList("背包锁定物品.lore键");
     }
 
-    public boolean getEnableBPLock(){
+    public boolean getEnableBPLock() {
         return getConfig().getBoolean("背包栏锁定.是否启用");
     }
 
@@ -98,75 +96,74 @@ public class FileUtils {
         return loreKeys;
     }
 
-    public String getBPSaveERROR(){
+    public String getBPSaveERROR() {
         return getConfig().getString("背包锁定物品.保存背包失败提示");
     }
 
-    public String getEditBPERROR(){
+    public String getEditBPERROR() {
         return getConfig().getString("不可编辑提示");
     }
 
-    public String getMaxItemsERROR(){
+    public String getMaxItemsERROR() {
         return getConfig().getString("背包栏锁定.超出最大物品数提示");
     }
 
-    public String getNOMatchItemsERROR(){
+    public String getNOMatchItemsERROR() {
         return getConfig().getString("背包栏锁定.不符合背包配置提示");
     }
 
-    public String getNoMatchERROR(){
+    public String getNoMatchERROR() {
         return getConfig().getString("背包栏锁定.不符合具体提示");
     }
 
-    public String getSyncSuccessTip(){
+    public String getSyncSuccessTip() {
         return getConfig().getString("背包同步成功提示");
     }
 
-    public String getSaveSuccessTip(){
+    public String getSaveSuccessTip() {
         return getConfig().getString("背包保存成功提示");
     }
 
-    public boolean getEnableClearInv(){
+    public boolean getEnableClearInv() {
         return getConfig().getBoolean("清除背包的世界.是否启用");
     }
 
     /**
-     *
      * @return 同步背包自动关闭时间
      */
-    public Integer getCloseSyncInvTime(){
+    public Integer getCloseSyncInvTime() {
         return getConfig().getInt("同步背包自动关闭时间");
     }
 
-    public String getCloseSyncInvTip(){
+    public String getCloseSyncInvTip() {
         return getConfig().getString("同步背包自动选择提示");
     }
 
-    public List<String> getNotAllowedRunCommand(){
+    public List<String> getNotAllowedRunCommand() {
         return getConfig().getStringList("控制台空背包执行命令");
     }
 
-    public String getEmptyBPRunCommand(){
+    public String getEmptyBPRunCommand() {
         return getConfig().getString("关闭空背包执行命令");
     }
 
-    public String getEmptyBPTip(){
+    public String getEmptyBPTip() {
         return getConfig().getString("空背包提示");
     }
 
-    public Integer getSyncTime(){
+    public Integer getSyncTime() {
         return getConfig().getInt("延迟同步背包的时间");
     }
 
-    public List<String> getEmptyCommandToPlayer(){
+    public List<String> getEmptyCommandToPlayer() {
         return getConfig().getStringList("玩家空背包执行命令");
     }
 
-    public  String getEmptyCommand(){
+    public String getEmptyCommand() {
         return getConfig().getString("空背包玩家执行命令");
     }
 
-    public Integer getHarmlessTime(){
+    public Integer getHarmlessTime() {
         return getConfig().getInt("关闭背包后的无敌时间");
     }
 }

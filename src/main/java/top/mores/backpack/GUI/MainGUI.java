@@ -23,6 +23,7 @@ public class MainGUI {
 
     FileUtils fileUtils = new FileUtils();
     final String separatorLine = "§7§m§e§m-§e§m-§6§m-§6§m-§8§m--------§6§m-§6§m-§e§m-§e§m-§7§m§m";
+
     private FileConfiguration getData() {
         return Backpack.getInstance().getDataConfig();
     }
@@ -94,7 +95,8 @@ public class MainGUI {
      * @param player 玩家ID
      */
     public void CreateMainInventory(Player player) {
-        Inventory MainInventory = Bukkit.createInventory(player, 9, "§d背包选择");
+        MainBPHolder holder = new MainBPHolder(player.getUniqueId());
+        Inventory MainInventory = Bukkit.createInventory(holder, 9, "§d背包选择");
         int index = MainInventory.firstEmpty();
         if (index != -1) {
             for (ItemStack item : MainInventoryItem(player.getName())) {
@@ -103,12 +105,12 @@ public class MainGUI {
         }
         player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE,
                 20 * fileUtils.getCloseSyncInvTime(), 255,
-                false, false,true));
+                false, false, true));
         player.openInventory(MainInventory);
     }
 
     public void CreateSaveGUI(Player player) {
-        Inventory saveGUI=Bukkit.createInventory(player,54,"§a保存数据");
+        Inventory saveGUI = Bukkit.createInventory(player, 54, "§a保存数据");
         player.openInventory(saveGUI);
     }
 }

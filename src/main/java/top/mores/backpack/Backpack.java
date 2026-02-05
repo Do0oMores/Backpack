@@ -117,11 +117,11 @@ public final class Backpack extends JavaPlugin {
 
         systemDataFile = new File(getDataFolder(), "systemData.yml");
         if (!systemDataFile.exists()) {
-            try{
-                if (systemDataFile.createNewFile()){
+            try {
+                if (systemDataFile.createNewFile()) {
                     getLogger().info("创建systemData.yml成功");
                 }
-            }catch (IOException e){
+            } catch (IOException e) {
                 getLogger().warning("创建systemData失败: " + e.getMessage());
             }
         }

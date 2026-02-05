@@ -20,7 +20,7 @@ import java.util.Map;
 
 public class SingleBackpack {
     MatchUtil matchUtil = new MatchUtil();
-    MessageUtil messageUtil=new MessageUtil();
+    MessageUtil messageUtil = new MessageUtil();
 
     /**
      * 单个背包物品数组
@@ -44,8 +44,9 @@ public class SingleBackpack {
      * @param slot   物品槽
      */
     public void CreateSingleInventory(Player player, int slot) {
+        SingleBPHolder holder = new SingleBPHolder(player.getUniqueId());
         //背包格式：两行物品栏
-        Inventory singleInventory = Bukkit.createInventory(player, 18, "§a背包" + slot);
+        Inventory singleInventory = Bukkit.createInventory(holder, 18, "§a背包" + slot);
         for (ItemStack item : SingleBackpackItems(player.getName(), slot)) {
             singleInventory.setItem(singleInventory.firstEmpty(), item);
         }
@@ -64,16 +65,16 @@ public class SingleBackpack {
         int[] whitePaneSlots = {12, 13, 14};
         int[] redPaneSlots = {15, 16, 17};
 
-        for(int s:barrierSlots){
-            singleInventory.setItem(s,barrier.clone());
+        for (int s : barrierSlots) {
+            singleInventory.setItem(s, barrier.clone());
         }
 
-        for(int s:whitePaneSlots){
-            singleInventory.setItem(s,whitePane.clone());
+        for (int s : whitePaneSlots) {
+            singleInventory.setItem(s, whitePane.clone());
         }
 
-        for (int s:redPaneSlots){
-            singleInventory.setItem(s,redPane.clone());
+        for (int s : redPaneSlots) {
+            singleInventory.setItem(s, redPane.clone());
         }
         player.openInventory(singleInventory);
     }
