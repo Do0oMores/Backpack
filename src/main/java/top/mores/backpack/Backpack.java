@@ -7,6 +7,7 @@ import org.jetbrains.annotations.NotNull;
 import top.mores.backpack.Command.BackpackCommand;
 import top.mores.backpack.Command.BackpackTabCompleter;
 import top.mores.backpack.EventListener.InventoryEventListener;
+import top.mores.backpack.EventListener.PlayerEventListener;
 import top.mores.backpack.GUI.MainGUI;
 
 import java.io.File;
@@ -29,6 +30,7 @@ public final class Backpack extends JavaPlugin {
         initFiles();
 
         MainGUI mainGUI = new MainGUI();
+        this.getServer().getPluginManager().registerEvents(new PlayerEventListener(), this);
         this.getServer().getPluginManager().registerEvents(new InventoryEventListener(mainGUI), this);
         Objects.requireNonNull(getCommand("bp")).setExecutor(new BackpackCommand());
         Objects.requireNonNull(getCommand("bp")).setTabCompleter(new BackpackTabCompleter());

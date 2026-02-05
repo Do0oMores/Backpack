@@ -184,11 +184,7 @@ public class InventoryEventListener implements Listener {
             clearTargetLore(player.getInventory());
         }
 
-        player.removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
-        //清除无敌后再给予无敌时间
-        player.addPotionEffect(new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE,
-                20 * fileUtils.getHarmlessTime(), 255,
-                false, false, true));
+        ProtectionManager.protect(player, fileUtils.getHarmlessTime());
         if (topInventory.getHolder() instanceof MainBPHolder) {
             if (checkEmptyInventory(player.getInventory())) {
                 if (fileUtils.isInSyncWorlds(player.getWorld().getName())) {
