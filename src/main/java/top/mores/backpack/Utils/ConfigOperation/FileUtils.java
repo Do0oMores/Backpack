@@ -17,7 +17,6 @@ public class FileUtils {
     private FileConfiguration getData() {
         return Backpack.getInstance().getDataConfig();
     }
-
     /**
      * 获取最大背包数量
      *
@@ -169,5 +168,9 @@ public class FileUtils {
 
     public String getMainGUITitle() {
         return getConfig().getString("主背包GUI标题");
+    }
+
+    public List<Integer> getEnabledSKillID(Player player, Integer i) {
+        return getData().getIntegerList(player.getName() + ".Backpack" + i + ".EnabledSkill");
     }
 }
