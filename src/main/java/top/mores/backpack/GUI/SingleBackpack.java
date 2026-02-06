@@ -1,7 +1,6 @@
 package top.mores.backpack.GUI;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
@@ -10,6 +9,8 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import top.mores.backpack.Backpack;
+import top.mores.backpack.GUI.holder.SingleBPHolder;
+import top.mores.backpack.Utils.ChatColorUtil;
 import top.mores.backpack.Utils.ItemStackUtil;
 import top.mores.backpack.Utils.MatchUtil;
 import top.mores.backpack.Utils.ArmorUtil;
@@ -47,8 +48,7 @@ public class SingleBackpack {
         SingleBPHolder holder = new SingleBPHolder(player.getUniqueId());
         //背包格式：两行物品栏
         Inventory singleInventory = Bukkit.createInventory(holder, 18,
-                ChatColor.translateAlternateColorCodes('&',
-                        messageUtil.getOtherGUITitle())+ slot);
+                ChatColorUtil.color(messageUtil.getOtherGUITitle()) + slot);
         for (ItemStack item : SingleBackpackItems(player.getName(), slot)) {
             singleInventory.setItem(singleInventory.firstEmpty(), item);
         }
@@ -142,12 +142,12 @@ public class SingleBackpack {
         ItemMeta meta = item.getItemMeta();
 
         if (meta == null) return item;
-        meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', name));
+        meta.setDisplayName(ChatColorUtil.color(name));
 
         if (lore != null && !lore.isEmpty()) {
             meta.setLore(
                     lore.stream()
-                            .map(line -> ChatColor.translateAlternateColorCodes('&', line))
+                            .map(ChatColorUtil::color)
                             .toList()
             );
         }

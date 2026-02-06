@@ -1,4 +1,4 @@
-package top.mores.backpack.GUI;
+package top.mores.backpack.GUI.holder;
 
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
 
-public class SingleBPHolder implements InventoryHolder {
+public class MainBPHolder implements InventoryHolder {
     private final UUID playerUUID;
 
     @Override
@@ -14,7 +14,7 @@ public class SingleBPHolder implements InventoryHolder {
         return null;
     }
 
-    public SingleBPHolder(UUID playerUUID) {
+    public MainBPHolder(UUID playerUUID) {
         this.playerUUID = playerUUID;
     }
 

@@ -1,5 +1,6 @@
 package top.mores.backpack.Utils.ConfigOperation;
 
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import top.mores.backpack.Backpack;
 
@@ -9,6 +10,10 @@ public class MessageUtil {
 
     private FileConfiguration getConfig() {
         return Backpack.getInstance().getConfigFile();
+    }
+
+    private FileConfiguration getSystemData() {
+        return Backpack.getInstance().getSystemDataConfig();
     }
 
     public String getOneItemName() {
@@ -37,5 +42,17 @@ public class MessageUtil {
 
     public String getOtherGUITitle() {
         return getConfig().getString("分背包GUI标题");
+    }
+
+    public String getSkillGUITitle() {
+        return getSystemData().getString("技能GUI标题");
+    }
+
+    public ConfigurationSection getPermission(){
+        return getSystemData().getConfigurationSection("permissions");
+    }
+
+    public ConfigurationSection getSKillGUIItem(){
+        return getSystemData().getConfigurationSection("技能");
     }
 }

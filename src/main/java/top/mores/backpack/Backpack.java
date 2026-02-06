@@ -86,7 +86,7 @@ public final class Backpack extends JavaPlugin {
         systemData = YamlConfiguration.loadConfiguration(systemDataFile);
     }
 
-    private FileConfiguration getSystemDataConfig() {
+    public FileConfiguration getSystemDataConfig() {
         if (systemData == null) {
             reloadSystemData();
         }

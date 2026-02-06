@@ -7,6 +7,8 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
+import java.util.List;
+
 public class ChatColorUtil {
 
     public static String parseDisplayName(String jsonString) {
@@ -70,5 +72,15 @@ public class ChatColorUtil {
             case "black" -> ChatColor.BLACK;
             default -> ChatColor.RESET;
         };
+    }
+
+    public static String color(String text) {
+        return ChatColor.translateAlternateColorCodes('&', text);
+    }
+
+    public static List<String> color(List<String> list){
+        return list.stream()
+                .map(ChatColorUtil::color)
+                .toList();
     }
 }

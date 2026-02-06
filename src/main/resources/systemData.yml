@@ -1,0 +1,35 @@
+path: C://example
+FileName: example.json
+技能GUI标题: 技能
+permissions:
+  tactical_skill.quick_heal: 1
+  tactical_skill.alert: 2
+  tactical_skill.light_gear: 3
+  tactical_skill.tactical_mask: 4
+  tactical_skill.teamwork: 5
+  tactical_skill.high_alert: 6
+技能:
+  1:
+    item:
+    name:
+    lore:
+  2:
+    item:
+    name:
+    lore:
+  3:
+    item:
+    name:
+    lore:
+  4:
+    item:
+    name:
+    lore:
+  5:
+    item:
+    name:
+    lore:
+  6:
+    item:
+    name:
+    lore:

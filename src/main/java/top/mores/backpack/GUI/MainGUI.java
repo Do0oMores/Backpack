@@ -10,6 +10,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import top.mores.backpack.Backpack;
 import top.mores.backpack.EventListener.ProtectionManager;
+import top.mores.backpack.GUI.holder.MainBPHolder;
 import top.mores.backpack.Utils.ChatColorUtil;
 import top.mores.backpack.Utils.ConfigOperation.FileUtils;
 
@@ -96,7 +97,7 @@ public class MainGUI {
     public void CreateMainInventory(Player player) {
         MainBPHolder holder = new MainBPHolder(player.getUniqueId());
         Inventory MainInventory = Bukkit.createInventory(holder, 9,
-                ChatColor.translateAlternateColorCodes('&', fileUtils.getMainGUITitle()));
+                ChatColorUtil.color(fileUtils.getMainGUITitle()));
         int index = MainInventory.firstEmpty();
         if (index != -1) {
             for (ItemStack item : MainInventoryItem(player.getName())) {
