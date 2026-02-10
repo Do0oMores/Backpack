@@ -24,7 +24,7 @@ public class PlayerEventListener implements Listener {
     public void onPlayerClickSkillGUI(InventoryClickEvent event){
         Inventory inventory = event.getView().getTopInventory();
         InventoryHolder holder = inventory.getHolder();
-        if (holder instanceof SkillGUIHolder){
+        if (holder instanceof SkillGUIHolder) {
             event.setCancelled(true);
         }
     }

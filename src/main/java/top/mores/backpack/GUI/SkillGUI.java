@@ -34,16 +34,12 @@ public class SkillGUI {
         Set<String> perms =
                 new HashSet<>(PermissionOperation.getPlayerPermissions(player, messageUtil.getPermission()));
         List<ItemStack> items = new ArrayList<>();
-
         for (Skill skill : SkillManager.getSkills()) {
-
             ItemStack item;
 
             if (skill.getPermission() != null &&
                     perms.contains(skill.getPermission())) {
-
                 boolean enabled = checkSkillEnabled(player, skill.getId(), getBPNumber(inventory));
-
                 Material pane = enabled
                         ? Material.LIME_STAINED_GLASS_PANE
                         : Material.WHITE_STAINED_GLASS_PANE;
@@ -73,7 +69,6 @@ public class SkillGUI {
         SkillGUIHolder holder = new SkillGUIHolder(player.getUniqueId(), getBPNumber(inventory));
         Inventory gui = Bukkit.createInventory(holder, 9,
                 ChatColorUtil.color(messageUtil.getSkillGUITitle()));
-
         for (ItemStack item : SkillGUIItem(player, inventory)) {
             gui.setItem(gui.firstEmpty(), item);
         }

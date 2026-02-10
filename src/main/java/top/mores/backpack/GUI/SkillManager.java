@@ -33,7 +33,6 @@ public class SkillManager {
                     .orElse(null);
 
             skill.setPermission(perm);
-
             skills.put(id, skill);
         }
     }
