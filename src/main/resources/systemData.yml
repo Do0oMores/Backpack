@@ -1,7 +1,7 @@
 path: C://example
 FileName: example.json
 技能GUI标题: 技能
-permissions:quick_heal:
+permissions:
   quick_heal: 1
   alert: 2
   light_gear: 3
@@ -12,30 +12,36 @@ permissions:quick_heal:
   1:
     item: 'DIAMOND'
     name: '&a快速治疗'
+    tag: 'quick_heal'
     lore:
-      - 'TEST'
+      - 'LOCK'
   2:
     item: 'DIAMOND'
     name: '&a警觉'
+    tag: 'alert'
     lore:
-      - 'TEST'
+      - 'LOCK'
   3:
     item: 'DIAMOND'
     name: '&a闪光'
+    tag: 'light_gear'
     lore:
-      - 'TEST'
+      - 'LOCK'
   4:
     item: 'DIAMOND'
     name: '&a面具'
+    tag: 'tactical_mask'
     lore:
-      - 'TEST'
+      - 'LOCK'
   5:
     item: 'DIAMOND'
     name: '&a团队协作'
+    tag: 'teamwork'
     lore:
-      - 'TEST'
+      - 'LOCK'
   6:
     item: 'DIAMOND'
     name: '&a高度警觉'
+    tag: 'high_alert'
     lore:
-      - 'TEST'
+      - 'LOCK'

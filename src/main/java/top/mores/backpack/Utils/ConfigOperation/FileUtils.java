@@ -173,4 +173,16 @@ public class FileUtils {
     public List<Integer> getEnabledSKillID(Player player, Integer i) {
         return getData().getIntegerList(player.getName() + ".Backpack" + i + ".EnabledSkill");
     }
+
+    public String getDisabledSkillTip(){
+        return getConfig().getString("关闭技能提示");
+    }
+
+    public String getEnabledSkillTip(){
+        return getConfig().getString("启用技能提示");
+    }
+
+    public String getMaxSkillsTip(){
+        return getConfig().getString("最大启用技能提示");
+    }
 }

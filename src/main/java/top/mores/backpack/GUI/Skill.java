@@ -9,6 +9,7 @@ public class Skill {
     String permission;
     Material icon;
     String name;
+    String tag;
     List<String> lore;
 
     public int getId() {
@@ -49,5 +50,13 @@ public class Skill {
 
     public void setIcon(Material icon) {
         this.icon = icon;
+    }
+
+    public String getTag() {
+        return tag;
+    }
+
+    public void setTag(String tag) {
+        this.tag = tag;
     }
 }

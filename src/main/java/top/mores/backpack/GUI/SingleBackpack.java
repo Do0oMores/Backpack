@@ -10,18 +10,18 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import top.mores.backpack.Backpack;
 import top.mores.backpack.GUI.holder.SingleBPHolder;
-import top.mores.backpack.Utils.ChatColorUtil;
-import top.mores.backpack.Utils.ItemStackUtil;
-import top.mores.backpack.Utils.MatchUtil;
-import top.mores.backpack.Utils.ArmorUtil;
+import top.mores.backpack.Permission.PermissionOperation;
+import top.mores.backpack.Utils.*;
+import top.mores.backpack.Utils.ConfigOperation.FileUtils;
 import top.mores.backpack.Utils.ConfigOperation.MessageUtil;
 
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class SingleBackpack {
     MatchUtil matchUtil = new MatchUtil();
     MessageUtil messageUtil = new MessageUtil();
+    FileUtils fileUtils = new FileUtils();
+    PermissionOperation permissionOperation = new PermissionOperation();
 
     /**
      * 单个背包物品数组
@@ -45,7 +45,7 @@ public class SingleBackpack {
      * @param slot   物品槽
      */
     public void CreateSingleInventory(Player player, int slot) {
-        SingleBPHolder holder = new SingleBPHolder(player.getUniqueId());
+        SingleBPHolder holder = new SingleBPHolder(player.getUniqueId(),slot);
         //背包格式：两行物品栏
         Inventory singleInventory = Bukkit.createInventory(holder, 18,
                 ChatColorUtil.color(messageUtil.getOtherGUITitle()) + slot);
@@ -67,8 +67,20 @@ public class SingleBackpack {
         int[] whitePaneSlots = {12, 13, 14};
         int[] redPaneSlots = {15, 16, 17};
 
-        for (int s : barrierSlots) {
-            singleInventory.setItem(s, barrier.clone());
+        List<ItemStack> skillItems = buildEnabledSkillItems(player, slot);
+        if (skillItems.isEmpty()) {
+            for (int s : barrierSlots) {
+                singleInventory.setItem(s, barrier.clone());
+            }
+        } else {
+            for (int i = 0; i < barrierSlots.length; i++) {
+                if (i < skillItems.size()) {
+                    singleInventory.setItem(barrierSlots[i], skillItems.get(i));
+                } else {
+                    singleInventory.setItem(barrierSlots[i],
+                            barrier.clone());
+                }
+            }
         }
 
         for (int s : whitePaneSlots) {
@@ -119,7 +131,7 @@ public class SingleBackpack {
         Bukkit.getScheduler().runTaskAsynchronously(Backpack.getInstance(), () -> {
             List<ItemStack> items = List.of(SingleBackpackItems(player.getName(), slot));
             matchUtil.returnItem(items, player);
-
+            permissionOperation.setSkillTags(player,permissionOperation.getPlayerBPTags(player,slot));
             Bukkit.getScheduler().runTask(Backpack.getInstance(), () -> {
                 player.getInventory().clear();
                 Inventory inventory = player.getInventory();
@@ -159,5 +171,21 @@ public class SingleBackpack {
 
         item.setItemMeta(meta);
         return item;
+    }
+
+    private List<ItemStack> buildEnabledSkillItems(Player player, int bpNumber){
+        List<Integer> enabled = fileUtils.getEnabledSKillID(player, bpNumber);
+        List<ItemStack> items = new ArrayList<>();
+        for(Integer id : enabled){
+            Skill skill = SkillManager.getSkill(id);
+            if(skill == null) continue;
+            ItemStack item = ItemBuilder.buildItem(
+                    skill.getIcon(),
+                    skill.getName(),
+                    skill.getLore()
+            );
+            items.add(item);
+        }
+        return items;
     }
 }

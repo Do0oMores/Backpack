@@ -6,10 +6,20 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.InventoryHolder;
+import top.mores.backpack.Backpack;
+import top.mores.backpack.GUI.SkillGUI;
+import top.mores.backpack.GUI.SkillManager;
 import top.mores.backpack.GUI.holder.SkillGUIHolder;
+import top.mores.backpack.Utils.ChatColorUtil;
+import top.mores.backpack.Utils.ConfigOperation.FileUtils;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 public class PlayerEventListener implements Listener {
+    FileUtils fileUtils = new FileUtils();
+    SkillGUI skillGUI = new SkillGUI();
 
     @EventHandler
     public void onDamage(EntityDamageEvent event) {
@@ -22,10 +32,37 @@ public class PlayerEventListener implements Listener {
 
     @EventHandler
     public void onPlayerClickSkillGUI(InventoryClickEvent event){
-        Inventory inventory = event.getView().getTopInventory();
-        InventoryHolder holder = inventory.getHolder();
-        if (holder instanceof SkillGUIHolder) {
-            event.setCancelled(true);
+        if (!(event.getWhoClicked() instanceof Player player)) return;
+        Inventory top=event.getView().getTopInventory();
+        if (!(top.getHolder() instanceof SkillGUIHolder holder)) return;
+        if (event.getClickedInventory()!=top) return;
+        event.setCancelled(true);
+        int slot=event.getRawSlot();
+        if (slot>=top.getSize()) return;
+        Integer skillID=holder.getSkill(slot);
+        if (skillID==null) return;
+
+        Set<Integer> enabled = new HashSet<>(fileUtils.getEnabledSKillID(player, holder.getBackpackSlot()));
+
+        if (enabled.contains(skillID)){
+            enabled.remove(skillID);
+            player.sendMessage(ChatColorUtil.color(fileUtils.getDisabledSkillTip()));
+        }else {
+            if (enabled.size()>=3){
+                player.sendMessage(ChatColorUtil.color(fileUtils.getMaxSkillsTip()));
+                return;
+            }
+            enabled.add(skillID);
+            player.sendMessage(ChatColorUtil.color(fileUtils.getEnabledSkillTip()));
         }
+        Backpack.getInstance().getDataConfig().set(
+                player.getName()+".Backpack"+holder.getBackpackSlot()+".EnabledSkill",
+                new ArrayList<>(enabled)
+        );
+        Backpack.getInstance().saveDataFile();
+        top.setItem(slot, skillGUI.buildSkillGUIItem(
+                        player,
+                        SkillManager.getSkill(skillID),
+                        holder.getBackpackSlot()));
     }
 }

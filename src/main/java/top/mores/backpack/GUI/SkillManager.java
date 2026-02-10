@@ -2,15 +2,14 @@ package top.mores.backpack.GUI;
 
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.entity.Player;
 import top.mores.backpack.Utils.ChatColorUtil;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class SkillManager {
 
-    private static final Map<Integer, Skill> skills = new HashMap<>();
+    private static final Map<Integer, Skill> skills = new LinkedHashMap<>();
 
     public static void loadSkills(ConfigurationSection section,
                                   ConfigurationSection permSection) {
@@ -25,6 +24,7 @@ public class SkillManager {
             skill.setName(ChatColorUtil.color(sec.getString("name")));
             skill.setLore(ChatColorUtil.color(sec.getStringList("lore")));
             skill.setIcon(Material.matchMaterial(sec.getString("item", "STONE")));
+            skill.setTag(sec.getString("tag"));
 
             String perm = permSection.getKeys(false)
                     .stream()
@@ -43,5 +43,16 @@ public class SkillManager {
 
     public static Collection<Skill> getSkills() {
         return skills.values();
+    }
+
+    public static List<Skill> getPlayerSkills(Player player){
+        Set<String> tags = player.getScoreboardTags();
+        List<Skill> list = new ArrayList<>();
+        for(Skill skill : skills.values()){
+            if(tags.contains(skill.getTag())){
+                list.add(skill);
+            }
+        }
+        return list;
     }
 }
