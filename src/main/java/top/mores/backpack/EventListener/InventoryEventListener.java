@@ -22,10 +22,12 @@ import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import top.mores.backpack.Backpack;
+import top.mores.backpack.GUI.SkillGUI;
 import top.mores.backpack.GUI.holder.MainBPHolder;
 import top.mores.backpack.GUI.holder.SingleBPHolder;
 import top.mores.backpack.GUI.MainGUI;
 import top.mores.backpack.GUI.SingleBackpack;
+import top.mores.backpack.GUI.holder.SkillGUIHolder;
 import top.mores.backpack.Utils.ConfigOperation.FileUtils;
 import top.mores.backpack.Utils.ItemStackUtil;
 
@@ -38,6 +40,7 @@ public class InventoryEventListener implements Listener {
     FileUtils fileUtils = new FileUtils();
     MainGUI mainGUI;
     SingleBackpack singleBackpack = new SingleBackpack();
+    SkillGUI skillGUI = new SkillGUI();
 
     public InventoryEventListener(MainGUI mainGUI) {
         this.mainGUI = mainGUI;
@@ -52,7 +55,6 @@ public class InventoryEventListener implements Listener {
 
     @EventHandler
     public void onPlayerClickInventory(InventoryClickEvent event) {
-
         HumanEntity player = event.getWhoClicked();
         Inventory inventory = event.getView().getTopInventory();
         Inventory clicked = event.getClickedInventory();
@@ -95,13 +97,20 @@ public class InventoryEventListener implements Listener {
                 holder instanceof MainBPHolder) {
             singleBackpack.CreateSingleInventory((Player) player, slot);
             event.setCancelled(true);
-        } else if (!(holder instanceof SingleBPHolder)) {
+        } else if (!(holder instanceof SingleBPHolder) && !(holder instanceof SkillGUIHolder)) {
             player.sendMessage(fileUtils.getEditBPERROR());
             event.setCancelled(true);
         }
 
         if (slot >= 9 && slot <= 18) {
             ItemStack clickItem = event.getCurrentItem();
+
+            if (clickItem != null &&
+                    clickItem.getType() == Material.WHITE_STAINED_GLASS_PANE) {
+                skillGUI.openSkillGUI((Player) player, inventory);
+                event.setCancelled(true);
+            }
+
             if (hasLockLore(clickItem)) {
                 event.setCancelled(true);
                 return;

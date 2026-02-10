@@ -30,6 +30,7 @@ public class BackpackCommand implements CommandExecutor {
                 if (commandSender.isOp()) {
                     Backpack.getInstance().reloadConfigFile();
                     Backpack.getInstance().reloadData();
+                    Backpack.getInstance().reloadSystemData();
                     commandSender.sendMessage("已重载配置文件");
                 }
             } else if (strings.length == 1 && strings[0].equals("save")) {

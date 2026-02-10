@@ -9,6 +9,8 @@ import top.mores.backpack.Command.BackpackTabCompleter;
 import top.mores.backpack.EventListener.InventoryEventListener;
 import top.mores.backpack.EventListener.PlayerEventListener;
 import top.mores.backpack.GUI.MainGUI;
+import top.mores.backpack.GUI.SkillManager;
+import top.mores.backpack.Utils.ConfigOperation.MessageUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,14 +30,14 @@ public final class Backpack extends JavaPlugin {
     public void onEnable() {
         instance = this;
         initFiles();
-
         MainGUI mainGUI = new MainGUI();
         this.getServer().getPluginManager().registerEvents(new PlayerEventListener(), this);
         this.getServer().getPluginManager().registerEvents(new InventoryEventListener(mainGUI), this);
         Objects.requireNonNull(getCommand("bp")).setExecutor(new BackpackCommand());
         Objects.requireNonNull(getCommand("bp")).setTabCompleter(new BackpackTabCompleter());
-
         config = getConfigFile();
+        MessageUtil messageUtil = new MessageUtil();
+        SkillManager.loadSkills(messageUtil.getSKillGUIItem(), messageUtil.getPermission());
         getLogger().info("Enabled!");
     }
 
@@ -82,7 +84,7 @@ public final class Backpack extends JavaPlugin {
         return data;
     }
 
-    private void reloadSystemData() {
+    public void reloadSystemData() {
         systemData = YamlConfiguration.loadConfiguration(systemDataFile);
     }
 

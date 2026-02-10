@@ -38,11 +38,11 @@ public class SkillManager {
         }
     }
 
-    public static Skill getSkill(int id){
+    public static Skill getSkill(int id) {
         return skills.get(id);
     }
 
-    public static Collection<Skill> getSkills(){
+    public static Collection<Skill> getSkills() {
         return skills.values();
     }
 }

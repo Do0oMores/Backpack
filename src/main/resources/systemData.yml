@@ -10,26 +10,32 @@ permissions:
   tactical_skill.high_alert: 6
 技能:
   1:
-    item:
-    name:
+    item: 'DIAMOND'
+    name: '&a快速治疗'
     lore:
+      - 'TEST'
   2:
-    item:
-    name:
+    item: 'DIAMOND'
+    name: '&a警觉'
     lore:
+      - 'TEST'
   3:
-    item:
-    name:
+    item: 'DIAMOND'
+    name: '&a闪光'
     lore:
+      - 'TEST'
   4:
-    item:
-    name:
+    item: 'DIAMOND'
+    name: '&a面具'
     lore:
+      - 'TEST'
   5:
-    item:
-    name:
+    item: 'DIAMOND'
+    name: '&a团队协作'
     lore:
+      - 'TEST'
   6:
-    item:
-    name:
+    item: 'DIAMOND'
+    name: '&a高度警觉'
     lore:
+      - 'TEST'

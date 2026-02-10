@@ -4,6 +4,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import top.mores.backpack.GUI.holder.SkillGUIHolder;
 import top.mores.backpack.Permission.PermissionOperation;
@@ -22,11 +23,16 @@ public class SkillGUI {
     MessageUtil messageUtil = new MessageUtil();
     FileUtils fileUtils = new FileUtils();
 
-    public List<ItemStack> SkillGUIItem(Player player, Integer bpNumber) {
-
+    /**
+     * 构建分背包内的技能GUI物品
+     *
+     * @param player    玩家
+     * @param inventory 分背包
+     * @return 技能GUI物品
+     */
+    public List<ItemStack> SkillGUIItem(Player player, Inventory inventory) {
         Set<String> perms =
                 new HashSet<>(PermissionOperation.getPlayerPermissions(player, messageUtil.getPermission()));
-
         List<ItemStack> items = new ArrayList<>();
 
         for (Skill skill : SkillManager.getSkills()) {
@@ -36,7 +42,7 @@ public class SkillGUI {
             if (skill.getPermission() != null &&
                     perms.contains(skill.getPermission())) {
 
-                boolean enabled = checkSkillEnabled(player, skill.getId(), bpNumber);
+                boolean enabled = checkSkillEnabled(player, skill.getId(), getBPNumber(inventory));
 
                 Material pane = enabled
                         ? Material.LIME_STAINED_GLASS_PANE
@@ -49,7 +55,6 @@ public class SkillGUI {
                 );
 
             } else {
-
                 item = ItemBuilder.buildItem(
                         Material.RED_STAINED_GLASS_PANE,
                         skill.getName(),
@@ -63,11 +68,13 @@ public class SkillGUI {
         return items;
     }
 
-    public void openSkillGUI(Player player, Integer bpNumber) {
-        SkillGUIHolder holder = new SkillGUIHolder(player.getUniqueId());
+    //打开技能主GUI
+    public void openSkillGUI(Player player, Inventory inventory) {
+        SkillGUIHolder holder = new SkillGUIHolder(player.getUniqueId(), getBPNumber(inventory));
         Inventory gui = Bukkit.createInventory(holder, 9,
                 ChatColorUtil.color(messageUtil.getSkillGUITitle()));
-        for (ItemStack item : SkillGUIItem(player, bpNumber)) {
+
+        for (ItemStack item : SkillGUIItem(player, inventory)) {
             gui.setItem(gui.firstEmpty(), item);
         }
         player.openInventory(gui);
@@ -75,5 +82,19 @@ public class SkillGUI {
 
     private boolean checkSkillEnabled(Player player, Integer skillId, Integer bpNumber) {
         return fileUtils.getEnabledSKillID(player, bpNumber).contains(skillId);
+    }
+
+    /**
+     * 获取背包编号
+     *
+     * @param inventory 背包
+     * @return 编号，默认会返回1
+     */
+    private Integer getBPNumber(Inventory inventory) {
+        InventoryHolder holder = inventory.getHolder();
+        if (holder instanceof SkillGUIHolder) {
+            return ((SkillGUIHolder) holder).getSlot();
+        }
+        return 1;
     }
 }
