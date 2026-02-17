@@ -110,10 +110,9 @@ public final class Backpack extends JavaPlugin {
         dataFile = new File(getDataFolder(), "data.yml");
         if (!dataFile.exists()) {
             try {
-                if (dataFile.createNewFile()) {
-                    getLogger().info("创建data.yml成功");
-                }
-            } catch (IOException e) {
+                saveResource("data.yml", false);
+                getLogger().info("创建data.yml成功");
+            } catch (Exception e) {
                 getLogger().warning("创建data.yml失败: " + e.getMessage());
             }
         }
@@ -122,10 +121,9 @@ public final class Backpack extends JavaPlugin {
         systemDataFile = new File(getDataFolder(), "systemData.yml");
         if (!systemDataFile.exists()) {
             try {
-                if (systemDataFile.createNewFile()) {
-                    getLogger().info("创建systemData.yml成功");
-                }
-            } catch (IOException e) {
+                saveResource("systemData.yml", false);
+                getLogger().info("创建systemData.yml成功");
+            } catch (Exception e) {
                 getLogger().warning("创建systemData失败: " + e.getMessage());
             }
         }

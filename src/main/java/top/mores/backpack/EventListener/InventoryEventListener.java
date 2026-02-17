@@ -54,11 +54,13 @@ public class InventoryEventListener implements Listener {
 
     @EventHandler
     public void onPlayerClickInventory(InventoryClickEvent event) {
-        HumanEntity player = event.getWhoClicked();
+        if (!(event.getWhoClicked() instanceof Player player)) return;
         Inventory inventory = event.getView().getTopInventory();
+        if (inventory.getHolder() instanceof SkillGUIHolder) return;
         Inventory clicked = event.getClickedInventory();
         InventoryHolder holder = inventory.getHolder();
         if (clicked == null) return;
+        if (event.getClickedInventory()!=inventory) return;
 
         // 判断是否是创建的背包
         if (!(holder instanceof SingleBPHolder) &&
@@ -83,7 +85,7 @@ public class InventoryEventListener implements Listener {
         // 根据玩家所在的世界进行同步或创建
         if (fileUtils.isInSyncWorlds(player.getWorld().getName()) &&
                 holder instanceof MainBPHolder) {
-            singleBackpack.SyncSingleBackpack((Player) player, slot);
+            singleBackpack.SyncSingleBackpack(player, slot);
             player.sendMessage(fileUtils.getSyncSuccessTip()
                     .replace("%slot%", String.valueOf(slot)));
             event.setCancelled(true);
@@ -94,7 +96,7 @@ public class InventoryEventListener implements Listener {
         // 检查是否在可编辑的世界中
         if (fileUtils.isInCanEditWorlds(player.getWorld().getName()) &&
                 holder instanceof MainBPHolder) {
-            singleBackpack.CreateSingleInventory((Player) player, slot);
+            singleBackpack.CreateSingleInventory(player, slot);
             event.setCancelled(true);
         }
 //        else if (!(holder instanceof SingleBPHolder) && !(holder instanceof SkillGUIHolder)) {
@@ -102,56 +104,58 @@ public class InventoryEventListener implements Listener {
 //            event.setCancelled(true);
 //        }
 
-        if (slot >= 9 && slot <= 18) {
-            ItemStack clickItem = event.getCurrentItem();
+        if (holder instanceof SingleBPHolder singleBPHolder) {
+            if (slot >= 9 && slot <= 18) {
+                ItemStack clickItem = event.getCurrentItem();
 
-            if (clickItem != null &&
-                    clickItem.getType() == Material.WHITE_STAINED_GLASS_PANE) {
-                skillGUI.openSkillGUI((Player) player, inventory);
-                event.setCancelled(true);
-            }
+                if (clickItem != null &&
+                        clickItem.getType() == Material.WHITE_STAINED_GLASS_PANE) {
+                    skillGUI.openSkillGUI(player, singleBPHolder.getBackpackSlot());
+                    event.setCancelled(true);
+                }
 
-            if (hasLockLore(clickItem)) {
-                event.setCancelled(true);
-                return;
-            }
-
-            ItemStack cursorItem = event.getCursor();
-            if (hasLockLore(cursorItem)) {
-                event.setCancelled(true);
-                return;
-            }
-
-            // 移动到其他背包的操作
-            if (event.getAction() == InventoryAction.MOVE_TO_OTHER_INVENTORY) {
-                ItemStack movedItem = event.getCurrentItem();
-                if (hasLockLore(movedItem)) {
+                if (hasLockLore(clickItem)) {
                     event.setCancelled(true);
                     return;
                 }
-            }
 
-            // 快捷栏交换的操作
-            if (event.getAction() == InventoryAction.SWAP_WITH_CURSOR) {
-                ItemStack hotbarItem = null;
-                if (event.getHotbarButton() >= 0) {
-                    hotbarItem = player.getInventory().getItem(event.getHotbarButton());
-                }
-                if ((hasLockLore(clickItem)) || (hasLockLore(hotbarItem))) {
+                ItemStack cursorItem = event.getCursor();
+                if (hasLockLore(cursorItem)) {
                     event.setCancelled(true);
                     return;
                 }
-            }
 
-            // 快捷栏移动操作
-            if (event.getAction() == InventoryAction.HOTBAR_SWAP ||
-                    event.getAction() == InventoryAction.HOTBAR_MOVE_AND_READD) {
-                int hotbarSlot = event.getHotbarButton();
-                if (hotbarSlot >= 0) {
-                    ItemStack hotbarItem = player.getInventory().getItem(hotbarSlot);
-                    if (hasLockLore(hotbarItem)) {
+                // 移动到其他背包的操作
+                if (event.getAction() == InventoryAction.MOVE_TO_OTHER_INVENTORY) {
+                    ItemStack movedItem = event.getCurrentItem();
+                    if (hasLockLore(movedItem)) {
                         event.setCancelled(true);
                         return;
+                    }
+                }
+
+                // 快捷栏交换的操作
+                if (event.getAction() == InventoryAction.SWAP_WITH_CURSOR) {
+                    ItemStack hotbarItem = null;
+                    if (event.getHotbarButton() >= 0) {
+                        hotbarItem = player.getInventory().getItem(event.getHotbarButton());
+                    }
+                    if ((hasLockLore(clickItem)) || (hasLockLore(hotbarItem))) {
+                        event.setCancelled(true);
+                        return;
+                    }
+                }
+
+                // 快捷栏移动操作
+                if (event.getAction() == InventoryAction.HOTBAR_SWAP ||
+                        event.getAction() == InventoryAction.HOTBAR_MOVE_AND_READD) {
+                    int hotbarSlot = event.getHotbarButton();
+                    if (hotbarSlot >= 0) {
+                        ItemStack hotbarItem = player.getInventory().getItem(hotbarSlot);
+                        if (hasLockLore(hotbarItem)) {
+                            event.setCancelled(true);
+                            return;
+                        }
                     }
                 }
             }
