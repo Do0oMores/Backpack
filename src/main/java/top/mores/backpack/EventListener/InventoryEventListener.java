@@ -27,7 +27,6 @@ import top.mores.backpack.GUI.holder.MainBPHolder;
 import top.mores.backpack.GUI.holder.SingleBPHolder;
 import top.mores.backpack.GUI.MainGUI;
 import top.mores.backpack.GUI.SingleBackpack;
-import top.mores.backpack.GUI.holder.SkillGUIHolder;
 import top.mores.backpack.Utils.ConfigOperation.FileUtils;
 import top.mores.backpack.Utils.ItemStackUtil;
 
@@ -97,10 +96,11 @@ public class InventoryEventListener implements Listener {
                 holder instanceof MainBPHolder) {
             singleBackpack.CreateSingleInventory((Player) player, slot);
             event.setCancelled(true);
-        } else if (!(holder instanceof SingleBPHolder) && !(holder instanceof SkillGUIHolder)) {
-            player.sendMessage(fileUtils.getEditBPERROR());
-            event.setCancelled(true);
         }
+//        else if (!(holder instanceof SingleBPHolder) && !(holder instanceof SkillGUIHolder)) {
+//            player.sendMessage(fileUtils.getEditBPERROR());
+//            event.setCancelled(true);
+//        }
 
         if (slot >= 9 && slot <= 18) {
             ItemStack clickItem = event.getCurrentItem();

@@ -53,7 +53,7 @@ public class SingleBackpack {
             singleInventory.setItem(singleInventory.firstEmpty(), item);
         }
         //第二行GUI
-        ItemStack barrier = createGUIItem(Material.BARRIER,
+        ItemStack barrier = createGUIItem(Material.STRUCTURE_VOID,
                 messageUtil.getOneItemName(),
                 messageUtil.getOneItemLore(), true);
         ItemStack whitePane = createGUIItem(Material.WHITE_STAINED_GLASS_PANE,
