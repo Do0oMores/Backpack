@@ -1,5 +1,4 @@
 path: C://example
-FileName: example.json
 技能GUI标题: 技能
 permissions:
   quick_heal: 1

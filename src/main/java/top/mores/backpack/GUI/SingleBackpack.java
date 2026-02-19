@@ -45,7 +45,7 @@ public class SingleBackpack {
      * @param slot   物品槽
      */
     public void CreateSingleInventory(Player player, int slot) {
-        SingleBPHolder holder = new SingleBPHolder(player.getUniqueId(),slot);
+        SingleBPHolder holder = new SingleBPHolder(player.getUniqueId(), slot);
         //背包格式：两行物品栏
         Inventory singleInventory = Bukkit.createInventory(holder, 18,
                 ChatColorUtil.color(messageUtil.getOtherGUITitle()) + slot);
@@ -131,7 +131,7 @@ public class SingleBackpack {
         Bukkit.getScheduler().runTaskAsynchronously(Backpack.getInstance(), () -> {
             List<ItemStack> items = List.of(SingleBackpackItems(player.getName(), slot));
             matchUtil.returnItem(items, player);
-            permissionOperation.setSkillTags(player,permissionOperation.getPlayerBPTags(player,slot));
+            permissionOperation.setSkillTags(player, permissionOperation.getPlayerBPTags(player, slot));
             Bukkit.getScheduler().runTask(Backpack.getInstance(), () -> {
                 player.getInventory().clear();
                 Inventory inventory = player.getInventory();
@@ -173,12 +173,12 @@ public class SingleBackpack {
         return item;
     }
 
-    private List<ItemStack> buildEnabledSkillItems(Player player, int bpNumber){
+    private List<ItemStack> buildEnabledSkillItems(Player player, int bpNumber) {
         List<Integer> enabled = fileUtils.getEnabledSKillID(player, bpNumber);
         List<ItemStack> items = new ArrayList<>();
-        for(Integer id : enabled){
+        for (Integer id : enabled) {
             Skill skill = SkillManager.getSkill(id);
-            if(skill == null) continue;
+            if (skill == null) continue;
             ItemStack item = ItemBuilder.buildItem(
                     skill.getIcon(),
                     skill.getName(),

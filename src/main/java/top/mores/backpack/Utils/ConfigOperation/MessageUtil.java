@@ -48,11 +48,15 @@ public class MessageUtil {
         return getSystemData().getString("技能GUI标题");
     }
 
-    public ConfigurationSection getPermission(){
+    public ConfigurationSection getPermission() {
         return getSystemData().getConfigurationSection("permissions");
     }
 
-    public ConfigurationSection getSKillGUIItem(){
+    public ConfigurationSection getSKillGUIItem() {
         return getSystemData().getConfigurationSection("技能");
+    }
+
+    public String getFilePath() {
+        return getSystemData().getString("path");
     }
 }

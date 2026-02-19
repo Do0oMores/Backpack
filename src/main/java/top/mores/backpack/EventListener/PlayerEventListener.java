@@ -31,24 +31,24 @@ public class PlayerEventListener implements Listener {
     }
 
     @EventHandler
-    public void onPlayerClickSkillGUI(InventoryClickEvent event){
+    public void onPlayerClickSkillGUI(InventoryClickEvent event) {
         if (!(event.getWhoClicked() instanceof Player player)) return;
-        Inventory top=event.getView().getTopInventory();
+        Inventory top = event.getView().getTopInventory();
         if (!(top.getHolder() instanceof SkillGUIHolder holder)) return;
-        if (event.getClickedInventory()!=top) return;
+        if (event.getClickedInventory() != top) return;
         event.setCancelled(true);
-        int slot=event.getRawSlot();
-        if (slot>=top.getSize()) return;
-        Integer skillID=holder.getSkill(slot);
-        if (skillID==null) return;
+        int slot = event.getRawSlot();
+        if (slot >= top.getSize()) return;
+        Integer skillID = holder.getSkill(slot);
+        if (skillID == null) return;
 
         Set<Integer> enabled = new HashSet<>(fileUtils.getEnabledSKillID(player, holder.getBackpackSlot()));
 
-        if (enabled.contains(skillID)){
+        if (enabled.contains(skillID)) {
             enabled.remove(skillID);
             player.sendMessage(ChatColorUtil.color(fileUtils.getDisabledSkillTip()));
-        }else {
-            if (enabled.size()>=3){
+        } else {
+            if (enabled.size() >= 3) {
                 player.sendMessage(ChatColorUtil.color(fileUtils.getMaxSkillsTip()));
                 return;
             }
@@ -56,13 +56,13 @@ public class PlayerEventListener implements Listener {
             player.sendMessage(ChatColorUtil.color(fileUtils.getEnabledSkillTip()));
         }
         Backpack.getInstance().getDataConfig().set(
-                player.getName()+".Backpack"+holder.getBackpackSlot()+".EnabledSkill",
+                player.getName() + ".Backpack" + holder.getBackpackSlot() + ".EnabledSkill",
                 new ArrayList<>(enabled)
         );
         Backpack.getInstance().saveDataFile();
         top.setItem(slot, skillGUI.buildSkillGUIItem(
-                        player,
-                        SkillManager.getSkill(skillID),
-                        holder.getBackpackSlot()));
+                player,
+                SkillManager.getSkill(skillID),
+                holder.getBackpackSlot()));
     }
 }

@@ -13,9 +13,9 @@ public class SkillGUIHolder implements InventoryHolder {
     private final UUID playerUUID;
     private final int backpackSlot;
 
-    private final Map<Integer,Integer> skillSlotMap = new HashMap<>();
+    private final Map<Integer, Integer> skillSlotMap = new HashMap<>();
 
-    public SkillGUIHolder(UUID playerUUID,int backpackSlot) {
+    public SkillGUIHolder(UUID playerUUID, int backpackSlot) {
         this.playerUUID = playerUUID;
         this.backpackSlot = backpackSlot;
     }
@@ -24,15 +24,15 @@ public class SkillGUIHolder implements InventoryHolder {
         return playerUUID;
     }
 
-    public int getBackpackSlot(){
+    public int getBackpackSlot() {
         return backpackSlot;
     }
 
-    public void bindSkill(int guiSlot,int skillId){
+    public void bindSkill(int guiSlot, int skillId) {
         skillSlotMap.put(guiSlot, skillId);
     }
 
-    public Integer getSkill(int guiSlot){
+    public Integer getSkill(int guiSlot) {
         return skillSlotMap.get(guiSlot);
     }
 

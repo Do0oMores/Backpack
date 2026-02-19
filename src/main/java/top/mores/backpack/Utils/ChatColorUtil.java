@@ -78,7 +78,7 @@ public class ChatColorUtil {
         return ChatColor.translateAlternateColorCodes('&', text);
     }
 
-    public static List<String> color(List<String> list){
+    public static List<String> color(List<String> list) {
         return list.stream()
                 .map(ChatColorUtil::color)
                 .toList();

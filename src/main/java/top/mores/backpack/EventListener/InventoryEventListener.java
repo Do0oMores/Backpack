@@ -23,10 +23,12 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import top.mores.backpack.Backpack;
 import top.mores.backpack.GUI.SkillGUI;
+import top.mores.backpack.GUI.SkillManager;
 import top.mores.backpack.GUI.holder.MainBPHolder;
 import top.mores.backpack.GUI.holder.SingleBPHolder;
 import top.mores.backpack.GUI.MainGUI;
 import top.mores.backpack.GUI.SingleBackpack;
+import top.mores.backpack.GUI.holder.SkillGUIHolder;
 import top.mores.backpack.Utils.ConfigOperation.FileUtils;
 import top.mores.backpack.Utils.ItemStackUtil;
 
@@ -40,6 +42,7 @@ public class InventoryEventListener implements Listener {
     MainGUI mainGUI;
     SingleBackpack singleBackpack = new SingleBackpack();
     SkillGUI skillGUI = new SkillGUI();
+    SkillManager skillManager = new SkillManager();
 
     public InventoryEventListener(MainGUI mainGUI) {
         this.mainGUI = mainGUI;
@@ -60,7 +63,7 @@ public class InventoryEventListener implements Listener {
         Inventory clicked = event.getClickedInventory();
         InventoryHolder holder = inventory.getHolder();
         if (clicked == null) return;
-        if (event.getClickedInventory()!=inventory) return;
+        if (event.getClickedInventory() != inventory) return;
 
         // 判断是否是创建的背包
         if (!(holder instanceof SingleBPHolder) &&
@@ -86,6 +89,7 @@ public class InventoryEventListener implements Listener {
         if (fileUtils.isInSyncWorlds(player.getWorld().getName()) &&
                 holder instanceof MainBPHolder) {
             singleBackpack.SyncSingleBackpack(player, slot);
+            skillManager.setSkills(player,slot);
             player.sendMessage(fileUtils.getSyncSuccessTip()
                     .replace("%slot%", String.valueOf(slot)));
             event.setCancelled(true);

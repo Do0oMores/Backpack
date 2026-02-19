@@ -17,6 +17,7 @@ public class FileUtils {
     private FileConfiguration getData() {
         return Backpack.getInstance().getDataConfig();
     }
+
     /**
      * 获取最大背包数量
      *
@@ -174,15 +175,15 @@ public class FileUtils {
         return getData().getIntegerList(player.getName() + ".Backpack" + i + ".EnabledSkill");
     }
 
-    public String getDisabledSkillTip(){
+    public String getDisabledSkillTip() {
         return getConfig().getString("关闭技能提示");
     }
 
-    public String getEnabledSkillTip(){
+    public String getEnabledSkillTip() {
         return getConfig().getString("启用技能提示");
     }
 
-    public String getMaxSkillsTip(){
+    public String getMaxSkillsTip() {
         return getConfig().getString("最大启用技能提示");
     }
 }

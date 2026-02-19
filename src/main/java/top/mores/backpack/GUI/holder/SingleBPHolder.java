@@ -28,11 +28,11 @@ public class SingleBPHolder implements InventoryHolder {
         return backpackSlot;
     }
 
-    public void bindSkill(int guiSlot, int skillId){
+    public void bindSkill(int guiSlot, int skillId) {
         skillSlotMap.put(guiSlot, skillId);
     }
 
-    public Integer getSkill(int guiSlot){
+    public Integer getSkill(int guiSlot) {
         return skillSlotMap.get(guiSlot);
     }
 

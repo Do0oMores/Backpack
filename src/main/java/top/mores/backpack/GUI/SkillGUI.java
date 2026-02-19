@@ -24,7 +24,7 @@ public class SkillGUI {
                                        Skill skill,
                                        int bpNumber) {
         Set<String> perms = new HashSet<>(PermissionOperation.getPlayerPermissions(player,
-                                messageUtil.getPermission()));
+                messageUtil.getPermission()));
 
         if (skill.getPermission() != null && perms.contains(skill.getPermission())) {
             boolean enabled = checkSkillEnabled(player, skill.getId(), bpNumber);
