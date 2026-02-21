@@ -19,10 +19,8 @@ public final class Backpack extends JavaPlugin {
     private static Backpack instance;
     private FileConfiguration config;
     private FileConfiguration data;
-    private FileConfiguration systemData;
     private File configFile;
     private File dataFile;
-    private File systemDataFile;
 
     @Override
     public void onEnable() {
@@ -82,17 +80,6 @@ public final class Backpack extends JavaPlugin {
         return data;
     }
 
-    private void reloadSystemData() {
-        systemData = YamlConfiguration.loadConfiguration(systemDataFile);
-    }
-
-    private FileConfiguration getSystemDataConfig() {
-        if (systemData == null) {
-            reloadSystemData();
-        }
-        return systemData;
-    }
-
     private void initFiles() {
         configFile = new File(getDataFolder(), "config.yml");
         if (!configFile.exists()) {
@@ -116,17 +103,5 @@ public final class Backpack extends JavaPlugin {
             }
         }
         reloadData();
-
-        systemDataFile = new File(getDataFolder(), "systemData.yml");
-        if (!systemDataFile.exists()) {
-            try {
-                if (systemDataFile.createNewFile()) {
-                    getLogger().info("创建systemData.yml成功");
-                }
-            } catch (IOException e) {
-                getLogger().warning("创建systemData失败: " + e.getMessage());
-            }
-        }
-        reloadSystemData();
     }
 }

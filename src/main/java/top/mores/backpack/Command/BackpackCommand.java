@@ -63,11 +63,9 @@ public class BackpackCommand implements CommandExecutor {
 
     private void setItemAmount(String itemName, int amount, CommandSender sender) {
         String path = "物品匹配." + itemName;
-
-        // 检查物品是否存在
+        //检查物品是否存在
         if (Backpack.getInstance().getDataConfig().contains(path)) {
             List<Map<?, ?>> itemData = Backpack.getInstance().getDataConfig().getMapList(path);
-
             if (!itemData.isEmpty()) {
                 // 更新第一个物品的数量
                 Map<String, Object> itemMap = (Map<String, Object>) itemData.get(0);
@@ -76,7 +74,6 @@ public class BackpackCommand implements CommandExecutor {
                 } else {
                     itemMap.put("amount", amount);
                 }
-
                 // 保存更新后的数据
                 Backpack.getInstance().getDataConfig().set(path, itemData);
                 Backpack.getInstance().saveDataFile();
