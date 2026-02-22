@@ -118,6 +118,54 @@ public class ItemStackUtil {
         return result;
     }
 
+    public static Map<String, Object> getItemStackMap(ItemStack itemStack, Integer amount) {
+        Map<String, Object> result = new LinkedHashMap<>();
+        result.put("type", itemStack.getType().name());
+        result.put("amount", amount);
+
+        ItemMeta meta = itemStack.getItemMeta();
+        if (!Bukkit.getItemFactory().equals(meta, null)) {
+            Map<String, Object> metaMap = null;
+            if (meta != null) {
+                metaMap = new LinkedHashMap<>(meta.serialize());
+
+                // 添加背包物品标识到lore（仅当不存在时）
+                List<String> lore = meta.hasLore() ? meta.getLore() : new ArrayList<>();
+                if (lore == null) lore = new ArrayList<>();
+
+                // 检查是否已包含背包物品标识
+                if (!lore.contains(BACKPACK_ITEM_LORE)) {
+                    lore.add(BACKPACK_ITEM_LORE);
+                }
+                metaMap.put("lore", lore);
+            }
+            if (metaMap != null && isAnHandledMetaType(metaMap.get("meta-type").toString())) {
+                metaMap.remove("meta-type");
+
+                if (meta instanceof LeatherArmorMeta) {
+                    metaMap.put("color", ((LeatherArmorMeta) meta).getColor().serialize());
+                }
+
+                if (meta instanceof PotionMeta) {
+                    PotionMeta potionMeta = (PotionMeta) meta;
+
+                    if (potionMeta.hasCustomEffects()) {
+                        List<Map<String, Object>> customEffectMeta = potionMeta.getCustomEffects().stream()
+                                .map(PotionEffect::serialize)
+                                .collect(Collectors.toList());
+                        metaMap.put("custom-effects", customEffectMeta);
+
+                        if (potionMeta.hasColor()) {
+                            metaMap.put("custom-color", Objects.requireNonNull(potionMeta.getColor()).serialize());
+                        }
+                    }
+                }
+            }
+            result.put("meta", metaMap);
+        }
+        return result;
+    }
+
     private static ItemStack deserialize(Map<String, Object> args) {
         int amount = 1;
 

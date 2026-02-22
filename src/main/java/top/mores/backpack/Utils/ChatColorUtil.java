@@ -71,4 +71,8 @@ public class ChatColorUtil {
             default -> ChatColor.RESET;
         };
     }
+
+    public static String color(String text) {
+        return org.bukkit.ChatColor.translateAlternateColorCodes('&', text);
+    }
 }

@@ -13,23 +13,31 @@ import java.util.stream.Stream;
 
 public class MatchUtil {
 
-    public void saveItemFromHand(Player player) {
+    public void saveItemFromHand(Player player, Integer amount) {
         ItemStack itemStack1 = player.getInventory().getItemInMainHand();
         ItemStack itemStack2 = player.getInventory().getItemInOffHand();
+
         if (itemStack1.getType() == Material.AIR || itemStack2.getType() == Material.AIR) {
             player.sendMessage("绑定的物品为空！");
-        } else {
-            if (Objects.requireNonNull(itemStack1.getItemMeta()).hasDisplayName()) {
-                List<Map<String, Object>> SerializedItem = Collections.singletonList(ItemStackUtil.getItemStackMap(itemStack2));
-                String itemName = itemStack1.getItemMeta().getDisplayName();
-                Backpack.getInstance().getDataConfig()
-                        .set("物品匹配." + itemName, SerializedItem);
-                Backpack.getInstance().saveDataFile();
-                player.sendMessage("物品" + itemName + "数据已写入成功！");
-            } else {
-                player.sendMessage("非指定物品！");
-            }
+            return;
         }
+
+        ItemMeta meta1 = itemStack1.getItemMeta();
+        if (meta1 == null || !meta1.hasDisplayName()) {
+            player.sendMessage("非指定物品！");
+            return;
+        }
+
+        int finalAmount = (amount == null ? itemStack2.getAmount() : amount);
+
+        List<Map<String, Object>> serializedItem =
+                Collections.singletonList(ItemStackUtil.getItemStackMap(itemStack2, finalAmount));
+
+        String itemName = meta1.getDisplayName();
+        Backpack.getInstance().getDataConfig().set("物品匹配." + itemName, serializedItem);
+        Backpack.getInstance().saveDataFile();
+
+        player.sendMessage("物品" + itemName + "数据已写入成功！数量=" + finalAmount);
     }
 
     public void returnItem(List<ItemStack> itemStacks, Player player) {

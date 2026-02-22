@@ -1,5 +1,6 @@
 package top.mores.backpack.Command;
 
+import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -32,10 +33,28 @@ public class BackpackCommand implements CommandExecutor {
                     Backpack.getInstance().reloadData();
                     commandSender.sendMessage("已重载配置文件");
                 }
-            } else if (strings.length == 1 && strings[0].equals("save")) {
-                if (commandSender.isOp()) {
-                    matchUtil.saveItemFromHand(sender);
+            } else if (strings.length >= 1 && strings[0].equals("save")) {
+                if (!commandSender.isOp()) {
+                    commandSender.sendMessage(ChatColor.RED + "您没有执行该命令的权限");
+                    return true;
                 }
+                Integer amount=null;
+                if (strings.length==2){
+                    try{
+                        amount=Integer.parseInt(strings[1]);
+                    }catch (NumberFormatException e){
+                        commandSender.sendMessage("数量必须是整数！");
+                        return true;
+                    }
+                    if (amount<=0){
+                        commandSender.sendMessage("数量必须大于0");
+                        return true;
+                    }
+                }else if (strings.length>2){
+                    commandSender.sendMessage("用法：/bp save [数量]");
+                    return true;
+                }
+                matchUtil.saveItemFromHand(sender,amount);
             } else if (strings.length == 1 && strings[0].equals("armor")) {
                 if (commandSender.isOp()) {
                     ArmorUtil.saveArmorSet(sender);
@@ -49,10 +68,6 @@ public class BackpackCommand implements CommandExecutor {
                     } catch (NumberFormatException e) {
                         commandSender.sendMessage("数量必须是整数！");
                     }
-                }
-            } else if (strings.length == 2 && strings[0].equals("savegui")) {
-                if (commandSender.isOp()) {
-                    mainGUI.CreateSaveGUI(sender);
                 }
             }
         } else {

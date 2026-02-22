@@ -62,7 +62,7 @@ public class MainGUI {
             // 读取 data.yml 文件中的背包数据
             List<Map<?, ?>> backpackItems = getData().getMapList(playerName + ".Backpack" + i + ".items");
 
-            // 如果背包为空，则显示“该背包为空”
+            // 背包为空
             if (backpackItems.isEmpty()) {
                 loreList.add(ChatColor.RED + "该背包为空");
             } else {
@@ -105,10 +105,5 @@ public class MainGUI {
         }
         ProtectionManager.protect(player, fileUtils.getCloseSyncInvTime());
         player.openInventory(MainInventory);
-    }
-
-    public void CreateSaveGUI(Player player) {
-        Inventory saveGUI = Bukkit.createInventory(player, 54, "§a保存数据");
-        player.openInventory(saveGUI);
     }
 }
