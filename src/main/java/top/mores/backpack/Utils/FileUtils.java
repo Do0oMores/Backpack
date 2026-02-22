@@ -170,8 +170,4 @@ public class FileUtils {
     public String getMainGUITitle() {
         return getConfig().getString("主背包GUI标题");
     }
-
-    public String getOtherGUITitle() {
-        return getConfig().getString("分背包GUI标题");
-    }
 }

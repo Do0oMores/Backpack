@@ -42,7 +42,7 @@ public class SingleBackpack {
         SingleBPHolder holder = new SingleBPHolder(player.getUniqueId());
         //背包格式：两行物品栏
         Inventory singleInventory = Bukkit.createInventory(holder, 9,
-                ChatColor.translateAlternateColorCodes('&',fileUtils.getOtherGUITitle()) + slot);
+                ChatColor.translateAlternateColorCodes('&',"&a背包") + slot);
         for (ItemStack item : SingleBackpackItems(player.getName(), slot)) {
             singleInventory.setItem(singleInventory.firstEmpty(), item);
         }

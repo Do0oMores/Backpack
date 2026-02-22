@@ -58,6 +58,8 @@ public class BackpackCommand implements CommandExecutor {
             } else if (strings.length == 1 && strings[0].equals("armor")) {
                 if (commandSender.isOp()) {
                     ArmorUtil.saveArmorSet(sender);
+                }else {
+                    commandSender.sendMessage("您没有使用该命令的权限");
                 }
             } else if (strings.length == 4 && strings[0].equals("set")) {
                 // set指令实现: /bp set <物品名> amount <数量>
