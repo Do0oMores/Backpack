@@ -31,6 +31,7 @@ import top.mores.backpack.GUI.SingleBackpack;
 import top.mores.backpack.GUI.holder.SkillGUIHolder;
 import top.mores.backpack.Utils.ConfigOperation.FileUtils;
 import top.mores.backpack.Utils.ItemStackUtil;
+import top.mores.backpack.session.BackpackSession;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -89,7 +90,7 @@ public class InventoryEventListener implements Listener {
         if (fileUtils.isInSyncWorlds(player.getWorld().getName()) &&
                 holder instanceof MainBPHolder) {
             singleBackpack.SyncSingleBackpack(player, slot);
-            skillManager.setSkills(player,slot);
+            skillManager.setSkills(player, slot);
             player.sendMessage(fileUtils.getSyncSuccessTip()
                     .replace("%slot%", String.valueOf(slot)));
             event.setCancelled(true);
@@ -103,10 +104,6 @@ public class InventoryEventListener implements Listener {
             singleBackpack.CreateSingleInventory(player, slot);
             event.setCancelled(true);
         }
-//        else if (!(holder instanceof SingleBPHolder) && !(holder instanceof SkillGUIHolder)) {
-//            player.sendMessage(fileUtils.getEditBPERROR());
-//            event.setCancelled(true);
-//        }
 
         if (holder instanceof SingleBPHolder singleBPHolder) {
             if (slot >= 9 && slot <= 18) {
@@ -501,5 +498,20 @@ public class InventoryEventListener implements Listener {
             }
         }
         return false;
+    }
+
+    public void flushSession(BackpackSession session) {
+        if (session == null) return;
+        UUID uuid = session.getPlayerId();
+        Player player = Bukkit.getPlayer(uuid);
+        if (player == null) return;
+
+        String name = player.getName();
+        int slot = session.getBackpackSlot();
+        Inventory inventory = session.getInventory();
+        Backpack.getInstance().getDataConfig().set(name + ".Backpack" + slot + ".Items",
+                ItemStackUtil.serializeItemStacks(inventory.getContents()));
+        Backpack.getInstance().saveDataFile();
+        session.clearDirty();
     }
 }

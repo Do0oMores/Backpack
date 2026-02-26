@@ -4,6 +4,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
@@ -167,10 +168,34 @@ public class ItemStackUtil {
         }
     }
 
+    public static List<Map<String,Object>> serializeItemStacks(ItemStack[] contents){
+        if (contents==null) return Collections.emptyList();
+        List<Map<String,Object>> list=new ArrayList<>(contents.length);
+        for (ItemStack item:contents){
+            if (item==null||item.getType()==Material.AIR){
+                list.add(null);
+            }else {
+                list.add(getItemStackMap(item));
+            }
+        }
+        return list;
+    }
+
+    public static List<Map<String,Object>> serializeInventory(Inventory inventory){
+        if (inventory==null) return Collections.emptyList();
+        return serializeItemStacks(inventory.getContents());
+    }
+
     public static ItemStack[] getItemStacksFromConfig(List<?> mapList) {
+        if (mapList==null) return new ItemStack[0];
         ItemStack[] result = new ItemStack[mapList.size()];
         for (int i = 0; i < mapList.size(); i++) {
-            result[i] = deserialize((Map<String, Object>) mapList.get(i));
+            Object o=mapList.get(i);
+            if (o==null){
+                result[i]=new ItemStack(Material.AIR);
+                continue;
+            }
+            result[i] = deserialize((Map<String, Object>) o);
         }
         return result;
     }
