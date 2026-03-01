@@ -2,6 +2,7 @@ package top.mores.backpack.EventListener;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -238,12 +239,19 @@ public class InventoryEventListener implements Listener {
     public void onPlayerChangeWorld(PlayerChangedWorldEvent event) {
         Player player = event.getPlayer();
         String NowWorldName = player.getWorld().getName();
+        GameMode playerGameMode = player.getGameMode();
+        boolean shouldSkipSyncOnWorldChange =
+                playerGameMode == GameMode.CREATIVE || playerGameMode == GameMode.SPECTATOR;
         if (fileUtils.getEnableClearInv()) {
             if (fileUtils.getDelPlayerInventoryWorld().contains(NowWorldName)) {
                 Bukkit.getScheduler().runTaskLater(Backpack.getInstance(), () ->
                         ItemStackUtil.removeBackpackItems(player.getInventory()), 20L);
             }
         }
+        if (shouldSkipSyncOnWorldChange) {
+            return;
+        }
+
         if (fileUtils.isInSyncWorlds(NowWorldName)) {
             World nowWorld = Bukkit.getWorld(NowWorldName);
             //解析世界中所有玩家
