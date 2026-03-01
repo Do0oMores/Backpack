@@ -1,9 +1,6 @@
 package top.mores.backpack.EventListener;
 
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
-import org.bukkit.Material;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
@@ -238,11 +235,16 @@ public class InventoryEventListener implements Listener {
     public void onPlayerChangeWorld(PlayerChangedWorldEvent event) {
         Player player = event.getPlayer();
         String NowWorldName = player.getWorld().getName();
+        GameMode playerGameMode = player.getGameMode();
+        boolean shouldSkipSyncOnWorldChange = playerGameMode == GameMode.SPECTATOR||playerGameMode == GameMode.CREATIVE;
         if (fileUtils.getEnableClearInv()) {
             if (fileUtils.getDelPlayerInventoryWorld().contains(NowWorldName)) {
                 Bukkit.getScheduler().runTaskLater(Backpack.getInstance(), () ->
                         ItemStackUtil.removeBackpackItems(player.getInventory()), 20L);
             }
+        }
+        if (shouldSkipSyncOnWorldChange) {
+            return;
         }
         if (fileUtils.isInSyncWorlds(NowWorldName)) {
             World nowWorld = Bukkit.getWorld(NowWorldName);
