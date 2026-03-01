@@ -198,7 +198,7 @@ public class InventoryEventListener implements Listener {
 
         ProtectionManager.protect(player, fileUtils.getHarmlessTime());
         if (topInventory.getHolder() instanceof MainBPHolder) {
-            if (checkEmptyInventory(player.getInventory())) {
+//            if (checkEmptyInventory(player.getInventory())) {
                 if (fileUtils.isInSyncWorlds(player.getWorld().getName())) {
                     int firstNonEmptyBackpack = getFirstNonEmptyBackpack(
                             player.getName(), Backpack.getInstance().getDataConfig());
@@ -214,7 +214,7 @@ public class InventoryEventListener implements Listener {
                         }
                     }
                 }
-            }
+//            }
         }
         //判断是否是目标背包
         if (!(topInventory.getHolder() instanceof SingleBPHolder)) {
@@ -445,15 +445,15 @@ public class InventoryEventListener implements Listener {
         return -1;
     }
 
-    private boolean checkEmptyInventory(Inventory inventory) {
-        for (int slot = 0; slot < 36; slot++) {
-            ItemStack item = inventory.getItem(slot);
-            if (item != null && item.getType() != Material.AIR) {
-                return false;
-            }
-        }
-        return true;
-    }
+//    private boolean checkEmptyInventory(Inventory inventory) {
+//        for (int slot = 0; slot < 36; slot++) {
+//            ItemStack item = inventory.getItem(slot);
+//            if (item != null && item.getType() != Material.AIR) {
+//                return false;
+//            }
+//        }
+//        return true;
+//    }
 
     private void clearTargetLore(Inventory inventory) {
         for (int slot = 0; slot < 36; slot++) {
