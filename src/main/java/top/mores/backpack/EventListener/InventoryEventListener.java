@@ -15,6 +15,8 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerKickEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
@@ -186,7 +188,6 @@ public class InventoryEventListener implements Listener {
     @EventHandler
     public void onPlayerCloseInventory(InventoryCloseEvent event) {
         InventoryView inventoryView = event.getView();
-        String title = inventoryView.getTitle();
         HumanEntity human = event.getPlayer();
         Inventory topInventory = event.getView().getTopInventory();
 
@@ -220,49 +221,17 @@ public class InventoryEventListener implements Listener {
         if (!(topInventory.getHolder() instanceof SingleBPHolder)) {
             return;
         }
-        String playerName = player.getName();
+        saveSingleBackpack(player, topInventory, true);
+    }
 
-        int mainAmount = singleBackpack.checkItemLoreContains(topInventory, fileUtils.getBPLoreLockItem().get(0));
-        int secondAmount = singleBackpack.checkItemLoreContains(topInventory, fileUtils.getBPLoreLockItem().get(1));
-        String backpackNumber = title.substring(title.lastIndexOf("背包") + 2);
-        String path = playerName + ".Backpack" + backpackNumber + ".items";
+    @EventHandler
+    public void onPlayerQuit(PlayerQuitEvent event) {
+        saveSingleBackpack(event.getPlayer(), event.getPlayer().getOpenInventory().getTopInventory(), false);
+    }
 
-        if (fileUtils.getEnableBPLoreLock()) {
-            if (mainAmount == 1 && secondAmount == 1) {
-                List<Map<String, Object>> serializedItems = getInvItems(topInventory);
-                Backpack.getInstance().getDataConfig().set(path, serializedItems);
-                Backpack.getInstance().saveDataFile();
-                player.sendMessage(fileUtils.getSaveSuccessTip()
-                        .replace("%number%", backpackNumber));
-            } else {
-                player.sendMessage(fileUtils.getBPSaveERROR());
-                returnInvItems(topInventory, player, path);
-            }
-        }
-        if (fileUtils.getEnableBPLock()) {
-            Map<Integer, List<String>> loreMap = fileUtils.getBPLockItem();
-            List<Map<String, Object>> invItems = getInvItems(topInventory);
-
-            if (invItems.size() > loreMap.size()) {
-                player.sendMessage(fileUtils.getMaxItemsERROR() + loreMap.size());
-                returnInvItems(topInventory, player, path);
-                return;
-            }
-            List<Integer> invalidSlots = getInvalidSlots(topInventory, loreMap);
-            if (invalidSlots.isEmpty()) {
-                Backpack.getInstance().getDataConfig().set(path, invItems);
-                Backpack.getInstance().saveDataFile();
-                player.sendMessage(ChatColor.GREEN + "背包 " + backpackNumber + " 已保存！");
-            } else {
-                String errorMsg = invalidSlots.stream()
-                        .map(slot -> fileUtils.getNoMatchERROR()
-                                .replace("%slot%", String.valueOf(slot + 1))
-                                .replace("%lore%", String.join(" / ", loreMap.get(slot))))
-                        .collect(Collectors.joining("， "));
-                player.sendMessage(fileUtils.getNOMatchItemsERROR() + errorMsg);
-                returnInvItems(topInventory, player, path);
-            }
-        }
+    @EventHandler
+    public void onPlayerKick(PlayerKickEvent event) {
+        saveSingleBackpack(event.getPlayer(), event.getPlayer().getOpenInventory().getTopInventory(), false);
     }
 
     @EventHandler
@@ -513,5 +482,67 @@ public class InventoryEventListener implements Listener {
                 ItemStackUtil.serializeItemStacks(inventory.getContents()));
         Backpack.getInstance().saveDataFile();
         session.clearDirty();
+    }
+
+    private void saveSingleBackpack(Player player, Inventory topInventory, boolean sendMessage) {
+        if (!(topInventory.getHolder() instanceof SingleBPHolder singleBPHolder)) {
+            return;
+        }
+
+        String playerName = player.getName();
+        int backpackSlot = singleBPHolder.getBackpackSlot();
+        String backpackNumber = String.valueOf(backpackSlot);
+        String path = playerName + ".Backpack" + backpackNumber + ".items";
+
+        int mainAmount = singleBackpack.checkItemLoreContains(topInventory, fileUtils.getBPLoreLockItem().get(0));
+        int secondAmount = singleBackpack.checkItemLoreContains(topInventory, fileUtils.getBPLoreLockItem().get(1));
+
+        if (fileUtils.getEnableBPLoreLock()) {
+            if (mainAmount == 1 && secondAmount == 1) {
+                List<Map<String, Object>> serializedItems = getInvItems(topInventory);
+                Backpack.getInstance().getDataConfig().set(path, serializedItems);
+                Backpack.getInstance().saveDataFile();
+                if (sendMessage) {
+                    player.sendMessage(fileUtils.getSaveSuccessTip().replace("%number%", backpackNumber));
+                }
+            } else {
+                if (sendMessage) {
+                    player.sendMessage(fileUtils.getBPSaveERROR());
+                }
+                returnInvItems(topInventory, player, path);
+            }
+        }
+
+        if (fileUtils.getEnableBPLock()) {
+            Map<Integer, List<String>> loreMap = fileUtils.getBPLockItem();
+            List<Map<String, Object>> invItems = getInvItems(topInventory);
+
+            if (invItems.size() > loreMap.size()) {
+                if (sendMessage) {
+                    player.sendMessage(fileUtils.getMaxItemsERROR() + loreMap.size());
+                }
+                returnInvItems(topInventory, player, path);
+                return;
+            }
+
+            List<Integer> invalidSlots = getInvalidSlots(topInventory, loreMap);
+            if (invalidSlots.isEmpty()) {
+                Backpack.getInstance().getDataConfig().set(path, invItems);
+                Backpack.getInstance().saveDataFile();
+                if (sendMessage) {
+                    player.sendMessage(ChatColor.GREEN + "背包 " + backpackNumber + " 已保存！");
+                }
+            } else {
+                if (sendMessage) {
+                    String errorMsg = invalidSlots.stream()
+                            .map(slot -> fileUtils.getNoMatchERROR()
+                                    .replace("%slot%", String.valueOf(slot + 1))
+                                    .replace("%lore%", String.join(" / ", loreMap.get(slot))))
+                            .collect(Collectors.joining("， "));
+                    player.sendMessage(fileUtils.getNOMatchItemsERROR() + errorMsg);
+                }
+                returnInvItems(topInventory, player, path);
+            }
+        }
     }
 }
