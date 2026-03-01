@@ -469,21 +469,6 @@ public class InventoryEventListener implements Listener {
         return false;
     }
 
-    public void flushSession(BackpackSession session) {
-        if (session == null) return;
-        UUID uuid = session.getPlayerId();
-        Player player = Bukkit.getPlayer(uuid);
-        if (player == null) return;
-
-        String name = player.getName();
-        int slot = session.getBackpackSlot();
-        Inventory inventory = session.getInventory();
-        Backpack.getInstance().getDataConfig().set(name + ".Backpack" + slot + ".Items",
-                ItemStackUtil.serializeItemStacks(inventory.getContents()));
-        Backpack.getInstance().saveDataFile();
-        session.clearDirty();
-    }
-
     private void saveSingleBackpack(Player player, Inventory topInventory, boolean sendMessage) {
         if (!(topInventory.getHolder() instanceof SingleBPHolder singleBPHolder)) {
             return;
