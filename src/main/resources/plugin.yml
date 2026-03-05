@@ -1,8 +1,8 @@
 name: Backpack
-version: '2.6.1'
+version: '2.6.2'
 main: top.mores.backpack.Backpack
 api-version: '1.18'
-authors: [Mores, Harry_H2O]
+authors: [Mores]
 description: 背包
 commands:
   bp:
