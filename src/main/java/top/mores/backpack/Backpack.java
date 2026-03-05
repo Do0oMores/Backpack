@@ -13,17 +13,16 @@ import top.mores.backpack.GUI.SkillManager;
 import top.mores.backpack.Utils.ConfigOperation.MessageUtil;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Objects;
 
 public final class Backpack extends JavaPlugin {
 
     private static Backpack instance;
     private FileConfiguration config;
-    private FileConfiguration data;
     private FileConfiguration systemData;
     private File configFile;
     private File dataFile;
+    private top.mores.backpack.storage.SQLiteStorage storage;
     private File systemDataFile;
 
     @Override
@@ -43,7 +42,9 @@ public final class Backpack extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        saveDataFile();
+        if (storage != null) {
+            storage.close();
+        }
         getLogger().info("Disabled!");
     }
 
@@ -62,26 +63,17 @@ public final class Backpack extends JavaPlugin {
         return config;
     }
 
-    // 保存 data.yml
-    public void saveDataFile() {
-        try {
-            data.save(dataFile);
-        } catch (IOException e) {
-            getLogger().severe("保存数据文件出错！" + e.getMessage());
-        }
+    public top.mores.backpack.storage.SQLiteStorage getStorage() {
+        return storage;
     }
 
-    // 重载 data.yml
+
     public void reloadData() {
-        data = YamlConfiguration.loadConfiguration(dataFile);
-    }
-
-    // 获取 data.yml
-    public FileConfiguration getDataConfig() {
-        if (data == null) {
-            reloadData();
+        if (storage != null) {
+            storage.close();
         }
-        return data;
+        storage = new top.mores.backpack.storage.SQLiteStorage(getDataFolder());
+        storage.initialize(dataFile);
     }
 
     public void reloadSystemData() {
@@ -116,7 +108,8 @@ public final class Backpack extends JavaPlugin {
                 getLogger().warning("创建data.yml失败: " + e.getMessage());
             }
         }
-        reloadData();
+        storage = new top.mores.backpack.storage.SQLiteStorage(getDataFolder());
+        storage.initialize(dataFile);
 
         systemDataFile = new File(getDataFolder(), "systemData.yml");
         if (!systemDataFile.exists()) {

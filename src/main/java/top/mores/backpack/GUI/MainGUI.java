@@ -3,7 +3,6 @@ package top.mores.backpack.GUI;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -24,17 +23,13 @@ public class MainGUI {
     FileUtils fileUtils = new FileUtils();
     final String separatorLine = "§7§m§e§m-§e§m-§6§m-§6§m-§8§m--------§6§m-§6§m-§e§m-§e§m-§7§m§m";
 
-    private FileConfiguration getData() {
-        return Backpack.getInstance().getDataConfig();
-    }
-
     /**
      * 构建主背包内的物品
      *
      * @param playerName 玩家ID
      * @return 主背包内的物品列表
      */
-    public List<ItemStack> MainInventoryItem(String playerName) {
+    public List<ItemStack> MainInventoryItem(Player player) {
         // 获取背包数量
         int backpackAmount = fileUtils.getBackpackAmount();
 
@@ -61,7 +56,7 @@ public class MainGUI {
             loreList.add(separatorLine);
 
             // 读取 data.yml 文件中的背包数据
-            List<Map<?, ?>> backpackItems = getData().getMapList(playerName + ".Backpack" + i + ".items");
+            List<Map<String, Object>> backpackItems = Backpack.getInstance().getStorage().getBackpackItems(player.getUniqueId(), i);
 
             // 如果背包为空，则显示“该背包为空”
             if (backpackItems.isEmpty()) {
@@ -100,7 +95,7 @@ public class MainGUI {
                 ChatColorUtil.color(fileUtils.getMainGUITitle()));
         int index = MainInventory.firstEmpty();
         if (index != -1) {
-            for (ItemStack item : MainInventoryItem(player.getName())) {
+            for (ItemStack item : MainInventoryItem(player)) {
                 MainInventory.setItem(MainInventory.firstEmpty(), item);
             }
         }

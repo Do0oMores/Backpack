@@ -1,7 +1,6 @@
 package top.mores.backpack.EventListener;
 
 import org.bukkit.*;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -198,8 +197,7 @@ public class InventoryEventListener implements Listener {
         if (topInventory.getHolder() instanceof MainBPHolder) {
 //            if (checkEmptyInventory(player.getInventory())) {
                 if (fileUtils.isInSyncWorlds(player.getWorld().getName())) {
-                    int firstNonEmptyBackpack = getFirstNonEmptyBackpack(
-                            player.getName(), Backpack.getInstance().getDataConfig());
+                    int firstNonEmptyBackpack = getFirstNonEmptyBackpack(player.getUniqueId());
                     if (firstNonEmptyBackpack != -1) {
                         singleBackpack.SyncSingleBackpack(player, firstNonEmptyBackpack);
                         player.sendMessage(fileUtils.getCloseSyncInvTip());
@@ -253,8 +251,7 @@ public class InventoryEventListener implements Listener {
             if (nowWorld != null) {
                 onWorldPlayers = nowWorld.getPlayers();
             }
-            int firstNonEmptyBackpack = getFirstNonEmptyBackpack(
-                    player.getName(), Backpack.getInstance().getDataConfig());
+            int firstNonEmptyBackpack = getFirstNonEmptyBackpack(player.getUniqueId());
             if (firstNonEmptyBackpack == -1) {
                 List<String> commandsConsole = fileUtils.getNotAllowedRunCommand();
                 List<String> commandsPlayer = fileUtils.getEmptyCommandToPlayer();
@@ -316,8 +313,7 @@ public class InventoryEventListener implements Listener {
         if (fileUtils.isInSyncWorlds(worldName)) {
             // 增加延迟打开背包选择界面，确保玩家完全重生
             Bukkit.getScheduler().runTaskLater(Backpack.getInstance(), () -> {
-                int firstNonEmptyBackpack = getFirstNonEmptyBackpack(
-                        player.getName(), Backpack.getInstance().getDataConfig());
+                int firstNonEmptyBackpack = getFirstNonEmptyBackpack(player.getUniqueId());
                 if (firstNonEmptyBackpack == -1) {
                     String command = fileUtils.getEmptyBPRunCommand()
                             .replace("%player%", player.getName());
@@ -371,7 +367,7 @@ public class InventoryEventListener implements Listener {
         return invalidSlots;
     }
 
-    public void returnInvItems(Inventory inventory, Player player, String path) {
+    public void returnInvItems(Inventory inventory, Player player, int backpackSlot) {
         for (int i = 0; i < 9; i++) {
             ItemStack item = inventory.getItem(i);
             if (item == null || item.getType() == Material.AIR)
@@ -382,8 +378,7 @@ public class InventoryEventListener implements Listener {
                     player.getLocation(), drop));
             inventory.setItem(i, null);
         }
-        Backpack.getInstance().getDataConfig().set(path, null);
-        Backpack.getInstance().saveDataFile();
+        Backpack.getInstance().getStorage().clearBackpackItems(player.getUniqueId(), backpackSlot);
     }
 
     //只取第一行物品
@@ -395,25 +390,8 @@ public class InventoryEventListener implements Listener {
                 .toList();
     }
 
-    public int getFirstNonEmptyBackpack(String playerName, FileConfiguration dataConfig) {
-        int number = fileUtils.getBackpackAmount();
-        for (int i = 1; i <= number; i++) {
-            String path = playerName + ".Backpack" + i + ".items";
-            Object value = dataConfig.get(path);
-
-            if (value == null) {
-                continue;
-            }
-            if (value instanceof String && ((String) value).isEmpty()) {
-                continue;
-            }
-            if (value instanceof List<?> list) {
-                if (!list.isEmpty()) {
-                    return i;
-                }
-            }
-        }
-        return -1;
+    public int getFirstNonEmptyBackpack(UUID playerUuid) {
+        return Backpack.getInstance().getStorage().findFirstNonEmptyBackpack(playerUuid, fileUtils.getBackpackAmount());
     }
 
 //    private boolean checkEmptyInventory(Inventory inventory) {
@@ -476,10 +454,8 @@ public class InventoryEventListener implements Listener {
             return;
         }
 
-        String playerName = player.getName();
         int backpackSlot = singleBPHolder.getBackpackSlot();
         String backpackNumber = String.valueOf(backpackSlot);
-        String path = playerName + ".Backpack" + backpackNumber + ".items";
 
         int mainAmount = singleBackpack.checkItemLoreContains(topInventory, fileUtils.getBPLoreLockItem().get(0));
         int secondAmount = singleBackpack.checkItemLoreContains(topInventory, fileUtils.getBPLoreLockItem().get(1));
@@ -487,8 +463,7 @@ public class InventoryEventListener implements Listener {
         if (fileUtils.getEnableBPLoreLock()) {
             if (mainAmount == 1 && secondAmount == 1) {
                 List<Map<String, Object>> serializedItems = getInvItems(topInventory);
-                Backpack.getInstance().getDataConfig().set(path, serializedItems);
-                Backpack.getInstance().saveDataFile();
+                Backpack.getInstance().getStorage().setBackpackItems(player.getUniqueId(), backpackSlot, serializedItems);
                 if (sendMessage) {
                     player.sendMessage(fileUtils.getSaveSuccessTip().replace("%number%", backpackNumber));
                 }
@@ -496,7 +471,7 @@ public class InventoryEventListener implements Listener {
                 if (sendMessage) {
                     player.sendMessage(fileUtils.getBPSaveERROR());
                 }
-                returnInvItems(topInventory, player, path);
+                returnInvItems(topInventory, player, backpackSlot);
             }
         }
 
@@ -508,14 +483,13 @@ public class InventoryEventListener implements Listener {
                 if (sendMessage) {
                     player.sendMessage(fileUtils.getMaxItemsERROR() + loreMap.size());
                 }
-                returnInvItems(topInventory, player, path);
+                returnInvItems(topInventory, player, backpackSlot);
                 return;
             }
 
             List<Integer> invalidSlots = getInvalidSlots(topInventory, loreMap);
             if (invalidSlots.isEmpty()) {
-                Backpack.getInstance().getDataConfig().set(path, invItems);
-                Backpack.getInstance().saveDataFile();
+                Backpack.getInstance().getStorage().setBackpackItems(player.getUniqueId(), backpackSlot, invItems);
                 if (sendMessage) {
                     player.sendMessage(ChatColor.GREEN + "背包 " + backpackNumber + " 已保存！");
                 }
@@ -528,7 +502,7 @@ public class InventoryEventListener implements Listener {
                             .collect(Collectors.joining("， "));
                     player.sendMessage(fileUtils.getNOMatchItemsERROR() + errorMsg);
                 }
-                returnInvItems(topInventory, player, path);
+                returnInvItems(topInventory, player, backpackSlot);
             }
         }
     }

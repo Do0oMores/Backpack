@@ -10,7 +10,6 @@ import top.mores.backpack.Backpack;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 public class BackpackTabCompleter implements TabCompleter {
     @Nullable
@@ -36,9 +35,7 @@ public class BackpackTabCompleter implements TabCompleter {
                 return filterCompletions(completions, args[0]);
             } else if (args.length == 2 && args[0].equals("set") && sender.isOp()) {
                 // set指令的第二个参数补全（物品名）
-                if (Backpack.getInstance().getDataConfig().contains("物品匹配")) {
-                    completions.addAll(Objects.requireNonNull(Backpack.getInstance().getDataConfig().getConfigurationSection("物品匹配")).getKeys(false));
-                }
+                completions.addAll(Backpack.getInstance().getStorage().getItemMatchKeys());
                 return filterCompletions(completions, args[1]);
             } else if (args.length == 3 && args[0].equals("set") && sender.isOp()) {
                 // set指令的第三个参数补全

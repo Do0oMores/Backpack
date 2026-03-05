@@ -2,7 +2,6 @@ package top.mores.backpack.GUI;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemFlag;
@@ -30,12 +29,9 @@ public class SingleBackpack {
      * @param slot       在主背包中表示的背包槽
      * @return 物品组
      */
-    public ItemStack[] SingleBackpackItems(String playerName, int slot) {
-        String path = playerName + ".Backpack" + slot + ".items";
-        FileConfiguration dataConfig = Backpack.getInstance().getDataConfig();
-        List<Map<String, Object>> itemList = dataConfig.contains(path) ?
-                (List<Map<String, Object>>) dataConfig.getList(path, List.<Map<String, Object>>of()) : null;
-        return (itemList != null) ? ItemStackUtil.getItemStacksFromConfig(itemList) : new ItemStack[0];
+    public ItemStack[] SingleBackpackItems(UUID playerUuid, int slot) {
+        List<Map<String, Object>> itemList = Backpack.getInstance().getStorage().getBackpackItems(playerUuid, slot);
+        return ItemStackUtil.getItemStacksFromConfig(itemList);
     }
 
     /**
@@ -49,7 +45,7 @@ public class SingleBackpack {
         //背包格式：两行物品栏
         Inventory singleInventory = Bukkit.createInventory(holder, 18,
                 ChatColorUtil.color(messageUtil.getOtherGUITitle()) + slot);
-        for (ItemStack item : SingleBackpackItems(player.getName(), slot)) {
+        for (ItemStack item : SingleBackpackItems(player.getUniqueId(), slot)) {
             singleInventory.setItem(singleInventory.firstEmpty(), item);
         }
         //第二行GUI
@@ -129,7 +125,7 @@ public class SingleBackpack {
      */
     public void SyncSingleBackpack(Player player, int slot) {
         Bukkit.getScheduler().runTaskAsynchronously(Backpack.getInstance(), () -> {
-            List<ItemStack> items = List.of(SingleBackpackItems(player.getName(), slot));
+            List<ItemStack> items = List.of(SingleBackpackItems(player.getUniqueId(), slot));
             matchUtil.returnItem(items, player);
             permissionOperation.setSkillTags(player, permissionOperation.getPlayerBPTags(player, slot));
             Bukkit.getScheduler().runTask(Backpack.getInstance(), () -> {

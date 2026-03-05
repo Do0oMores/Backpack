@@ -14,10 +14,6 @@ public class FileUtils {
         return Backpack.getInstance().getConfigFile();
     }
 
-    private FileConfiguration getData() {
-        return Backpack.getInstance().getDataConfig();
-    }
-
     /**
      * 获取最大背包数量
      *
@@ -33,14 +29,7 @@ public class FileUtils {
      * @param player 需要初始化的玩家
      */
     public void initPLayerMainInventoryData(Player player) {
-        String playerName = player.getName();
-        if (!getData().contains(playerName)) {
-            int index = getBackpackAmount();
-            for (int i = 1; i <= index; i++) {
-                getData().set(playerName + ".Backpack" + i + ".items", "");
-            }
-        }
-        Backpack.getInstance().saveDataFile();
+        Backpack.getInstance().getStorage().initializePlayerBackpacks(player.getUniqueId(), getBackpackAmount());
     }
 
     /**
@@ -172,7 +161,7 @@ public class FileUtils {
     }
 
     public List<Integer> getEnabledSKillID(Player player, Integer i) {
-        return getData().getIntegerList(player.getName() + ".Backpack" + i + ".EnabledSkill");
+        return Backpack.getInstance().getStorage().getEnabledSkills(player.getUniqueId(), i);
     }
 
     public String getDisabledSkillTip() {
