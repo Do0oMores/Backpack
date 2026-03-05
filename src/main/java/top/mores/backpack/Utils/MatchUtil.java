@@ -22,9 +22,7 @@ public class MatchUtil {
             if (Objects.requireNonNull(itemStack1.getItemMeta()).hasDisplayName()) {
                 List<Map<String, Object>> SerializedItem = Collections.singletonList(ItemStackUtil.getItemStackMap(itemStack2));
                 String itemName = itemStack1.getItemMeta().getDisplayName();
-                Backpack.getInstance().getDataConfig()
-                        .set("物品匹配." + itemName, SerializedItem);
-                Backpack.getInstance().saveDataFile();
+                Backpack.getInstance().getStorage().setItemMatch(itemName, SerializedItem);
                 player.sendMessage("物品" + itemName + "数据已写入成功！");
             } else {
                 player.sendMessage("非指定物品！");
@@ -43,9 +41,9 @@ public class MatchUtil {
                     .map(meta -> {
                         String itemName = meta.getDisplayName();
                         String path = "物品匹配." + itemName;
-                        if (Backpack.getInstance().getDataConfig().contains(path)) {
+                        if (Backpack.getInstance().getStorage().hasItemMatch(itemName)) {
                             return ItemStackUtil.getItemStacksFromConfig(
-                                    Backpack.getInstance().getDataConfig().getMapList(path)
+                                    Backpack.getInstance().getStorage().getItemMatch(itemName)
                             );
                         } else {
                             return new ItemStack[0];

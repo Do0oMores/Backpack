@@ -63,15 +63,12 @@ public class BackpackCommand implements CommandExecutor {
     }
 
     private void setItemAmount(String itemName, int amount, CommandSender sender) {
-        String path = "物品匹配." + itemName;
-
-        // 检查物品是否存在
-        if (Backpack.getInstance().getDataConfig().contains(path)) {
-            List<Map<?, ?>> itemData = Backpack.getInstance().getDataConfig().getMapList(path);
+        if (Backpack.getInstance().getStorage().hasItemMatch(itemName)) {
+            List<Map<String, Object>> itemData = Backpack.getInstance().getStorage().getItemMatch(itemName);
 
             if (!itemData.isEmpty()) {
                 // 更新第一个物品的数量
-                Map<String, Object> itemMap = (Map<String, Object>) itemData.get(0);
+                Map<String, Object> itemMap = itemData.get(0);
                 if (amount <= 0) {
                     itemMap.remove("amount"); // 数量为1时移除amount键
                 } else {
@@ -79,8 +76,7 @@ public class BackpackCommand implements CommandExecutor {
                 }
 
                 // 保存更新后的数据
-                Backpack.getInstance().getDataConfig().set(path, itemData);
-                Backpack.getInstance().saveDataFile();
+                Backpack.getInstance().getStorage().setItemMatch(itemName, itemData);
                 sender.sendMessage("已将物品 " + itemName + " 的数量设置为 " + amount);
             } else {
                 sender.sendMessage("物品数据格式错误");

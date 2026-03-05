@@ -2,7 +2,6 @@ package top.mores.backpack.Utils;
 
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.configuration.file.FileConfiguration;
 import top.mores.backpack.Backpack;
 
 import java.util.List;
@@ -26,9 +25,7 @@ public class ArmorUtil {
             }
         }
 
-        FileConfiguration dataConfig = Backpack.getInstance().getDataConfig();
-        dataConfig.set("盔甲套装.default", serializedArmor);
-        Backpack.getInstance().saveDataFile();
+        Backpack.getInstance().getStorage().setArmorSet("default", serializedArmor);
 
         player.sendMessage("默认盔甲套装已保存！");
     }
@@ -39,21 +36,9 @@ public class ArmorUtil {
      * @param player 玩家
      */
     public static void equipDefaultArmor(Player player) {
-        FileConfiguration dataConfig = Backpack.getInstance().getDataConfig();
-        String path = "盔甲套装.default";
+        List<Map<String, Object>> armorData = Backpack.getInstance().getStorage().getArmorSet("default");
 
-        if (dataConfig.contains(path)) {
-            List<Map<?, ?>> rawArmorData = dataConfig.getMapList(path);
-            List<Map<String, Object>> armorData = new ArrayList<>();
-            for (Map<?, ?> map : rawArmorData) {
-                Map<String, Object> newMap = new java.util.HashMap<>();
-                for (Map.Entry<?, ?> entry : map.entrySet()) {
-                    if (entry.getKey() instanceof String) {
-                        newMap.put((String) entry.getKey(), entry.getValue());
-                    }
-                }
-                armorData.add(newMap);
-            }
+        if (!armorData.isEmpty()) {
             ItemStack[] armorItems = ItemStackUtil.getItemStacksFromConfig(armorData);
 
             ItemStack[] armorContents = new ItemStack[4];

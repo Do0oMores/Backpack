@@ -55,11 +55,11 @@ public class PlayerEventListener implements Listener {
             enabled.add(skillID);
             player.sendMessage(ChatColorUtil.color(fileUtils.getEnabledSkillTip()));
         }
-        Backpack.getInstance().getDataConfig().set(
-                player.getName() + ".Backpack" + holder.getBackpackSlot() + ".EnabledSkill",
+        Backpack.getInstance().getStorage().setEnabledSkills(
+                player.getUniqueId(),
+                holder.getBackpackSlot(),
                 new ArrayList<>(enabled)
         );
-        Backpack.getInstance().saveDataFile();
         top.setItem(slot, skillGUI.buildSkillGUIItem(
                 player,
                 SkillManager.getSkill(skillID),
