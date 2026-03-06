@@ -1,10 +1,5 @@
 package top.mores.backpack.storage;
 
-import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
-import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONValue;
 import org.json.simple.parser.JSONParser;
@@ -16,8 +11,6 @@ import java.util.*;
 
 public class SQLiteStorage {
     private static final String EMPTY_JSON_ARRAY = "[]";
-    private static final String META_KEY_YAML_MIGRATED = "yaml_migrated_v1";
-
     private final File databaseFile;
     private Connection connection;
 
@@ -25,12 +18,11 @@ public class SQLiteStorage {
         this.databaseFile = new File(dataFolder, "backpack.db");
     }
 
-    public synchronized void initialize(File legacyDataFile) {
+    public synchronized void initialize() {
         try {
             openConnectionIfNeeded();
             configureConnection();
             createTables();
-            migrateFromYamlIfNeeded(legacyDataFile);
         } catch (SQLException e) {
             Backpack.getInstance().getLogger().severe("初始化SQLite失败: " + e.getMessage());
             e.printStackTrace();
@@ -360,7 +352,7 @@ public class SQLiteStorage {
     }
 
     /* =========================
-       初始化 / 迁移
+       初始化
        ========================= */
 
     private void createTables() throws SQLException {
@@ -385,10 +377,6 @@ public class SQLiteStorage {
                     "items_json TEXT NOT NULL" +
                     ")");
 
-            statement.executeUpdate("CREATE TABLE IF NOT EXISTS storage_meta (" +
-                    "meta_key TEXT PRIMARY KEY," +
-                    "meta_value TEXT NOT NULL" +
-                    ")");
         }
     }
 
@@ -400,168 +388,6 @@ public class SQLiteStorage {
             st.execute("PRAGMA synchronous=NORMAL;");
             st.execute("PRAGMA busy_timeout=5000;");
             st.execute("PRAGMA foreign_keys=ON;");
-        }
-    }
-
-    private void migrateFromYamlIfNeeded(File legacyDataFile) throws SQLException {
-        if (legacyDataFile == null || !legacyDataFile.exists()) {
-            return;
-        }
-        if (isYamlMigrationDone()) {
-            return;
-        }
-
-        FileConfiguration legacy = YamlConfiguration.loadConfiguration(legacyDataFile);
-
-        boolean autoCommit = connection.getAutoCommit();
-        connection.setAutoCommit(false);
-        try {
-            migrateGlobalEntries(legacy);
-            migratePlayerEntries(legacy);
-            setMetaValue(META_KEY_YAML_MIGRATED, "true");
-            connection.commit();
-
-            Backpack.getInstance().getLogger().info("已完成 legacy data.yml -> SQLite 数据迁移");
-        } catch (Exception e) {
-            connection.rollback();
-            throw new SQLException("迁移YAML数据失败: " + e.getMessage(), e);
-        } finally {
-            connection.setAutoCommit(autoCommit);
-        }
-    }
-
-    private void migrateGlobalEntries(FileConfiguration legacy) {
-        ConfigurationSection itemMatch = legacy.getConfigurationSection("物品匹配");
-        if (itemMatch != null) {
-            for (String key : itemMatch.getKeys(false)) {
-                setItemMatch(key, convertToStringObjectMapList(itemMatch.getMapList(key)));
-            }
-        }
-
-        ConfigurationSection armorSets = legacy.getConfigurationSection("盔甲套装");
-        if (armorSets != null) {
-            for (String key : armorSets.getKeys(false)) {
-                setArmorSet(key, convertToStringObjectMapList(armorSets.getMapList(key)));
-            }
-        }
-    }
-
-    private void migratePlayerEntries(FileConfiguration legacy) {
-        Set<String> ignoredKeys = Set.of("物品匹配", "盔甲套装");
-
-        for (String topLevelKey : legacy.getKeys(false)) {
-            if (ignoredKeys.contains(topLevelKey)) {
-                continue;
-            }
-
-            UUID uuid = resolvePlayerUuid(topLevelKey);
-            if (uuid == null) {
-                Backpack.getInstance().getLogger().warning("无法解析玩家UUID，跳过迁移: " + topLevelKey);
-                continue;
-            }
-
-            ConfigurationSection section = legacy.getConfigurationSection(topLevelKey);
-            if (section == null) {
-                continue;
-            }
-
-            for (String backpackKey : section.getKeys(false)) {
-                if (!backpackKey.startsWith("Backpack")) {
-                    continue;
-                }
-
-                int slot;
-                try {
-                    slot = Integer.parseInt(backpackKey.replace("Backpack", ""));
-                } catch (NumberFormatException e) {
-                    Backpack.getInstance().getLogger().warning("非法背包槽位名，跳过迁移: " + backpackKey);
-                    continue;
-                }
-
-                String root = topLevelKey + "." + backpackKey;
-                List<Map<String, Object>> items = convertToStringObjectMapList(legacy.getMapList(root + ".items"));
-                List<Integer> skills = legacy.getIntegerList(root + ".EnabledSkill");
-
-                upsertBackpack(uuid, slot, items, skills);
-            }
-        }
-    }
-
-    private UUID resolvePlayerUuid(String nameOrUuid) {
-        if (nameOrUuid == null || nameOrUuid.isBlank()) {
-            return null;
-        }
-
-        try {
-            return UUID.fromString(nameOrUuid);
-        } catch (IllegalArgumentException ignored) {
-        }
-
-        try {
-            OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(nameOrUuid);
-            return offlinePlayer != null ? offlinePlayer.getUniqueId() : null;
-        } catch (Exception e) {
-            Backpack.getInstance().getLogger().warning("解析玩家UUID失败: " + nameOrUuid + ", " + e.getMessage());
-            return null;
-        }
-    }
-
-    private void upsertBackpack(UUID uuid, int slot, List<Map<String, Object>> items, List<Integer> skills) {
-        final String sql = "INSERT INTO player_backpacks(player_uuid, backpack_slot, items_json, enabled_skills_json) VALUES (?, ?, ?, ?) " +
-                "ON CONFLICT(player_uuid, backpack_slot) DO UPDATE SET items_json=excluded.items_json, enabled_skills_json=excluded.enabled_skills_json";
-
-        try {
-            ensureConnection();
-
-            try (PreparedStatement ps = connection.prepareStatement(sql)) {
-                ps.setString(1, uuid.toString());
-                ps.setInt(2, slot);
-                ps.setString(3, toJson(items == null ? Collections.emptyList() : items));
-                ps.setString(4, toJson(skills == null ? Collections.emptyList() : skills));
-                ps.executeUpdate();
-            }
-        } catch (SQLException e) {
-            Backpack.getInstance().getLogger().warning("迁移背包数据失败: " + uuid + " slot=" + slot + ", " + e.getMessage());
-        }
-    }
-
-    /* =========================
-       Meta
-       ========================= */
-
-    private boolean isYamlMigrationDone() throws SQLException {
-        String value = getMetaValue(META_KEY_YAML_MIGRATED);
-        return "true".equalsIgnoreCase(value);
-    }
-
-    private String getMetaValue(String key) throws SQLException {
-        final String sql = "SELECT meta_value FROM storage_meta WHERE meta_key=?";
-
-        ensureConnection();
-
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setString(1, key);
-
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    return rs.getString("meta_value");
-                }
-            }
-        }
-
-        return null;
-    }
-
-    private void setMetaValue(String key, String value) throws SQLException {
-        final String sql = "INSERT INTO storage_meta(meta_key, meta_value) VALUES (?, ?) " +
-                "ON CONFLICT(meta_key) DO UPDATE SET meta_value=excluded.meta_value";
-
-        ensureConnection();
-
-        try (PreparedStatement ps = connection.prepareStatement(sql)) {
-            ps.setString(1, key);
-            ps.setString(2, value);
-            ps.executeUpdate();
         }
     }
 
