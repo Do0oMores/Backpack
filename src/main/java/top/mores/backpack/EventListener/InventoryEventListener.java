@@ -29,7 +29,6 @@ import top.mores.backpack.GUI.SingleBackpack;
 import top.mores.backpack.GUI.holder.SkillGUIHolder;
 import top.mores.backpack.Utils.ConfigOperation.FileUtils;
 import top.mores.backpack.Utils.ItemStackUtil;
-import top.mores.backpack.session.BackpackSession;
 
 import java.util.*;
 import java.util.stream.Collectors;
