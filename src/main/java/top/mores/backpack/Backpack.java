@@ -21,7 +21,6 @@ public final class Backpack extends JavaPlugin {
     private FileConfiguration config;
     private FileConfiguration systemData;
     private File configFile;
-    private File dataFile;
     private top.mores.backpack.storage.SQLiteStorage storage;
     private File systemDataFile;
 
@@ -73,7 +72,7 @@ public final class Backpack extends JavaPlugin {
             storage.close();
         }
         storage = new top.mores.backpack.storage.SQLiteStorage(getDataFolder());
-        storage.initialize(dataFile);
+        storage.initialize();
     }
 
     public void reloadSystemData() {
@@ -99,17 +98,8 @@ public final class Backpack extends JavaPlugin {
         }
         reloadConfigFile();
 
-        dataFile = new File(getDataFolder(), "data.yml");
-        if (!dataFile.exists()) {
-            try {
-                saveResource("data.yml", false);
-                getLogger().info("创建data.yml成功");
-            } catch (Exception e) {
-                getLogger().warning("创建data.yml失败: " + e.getMessage());
-            }
-        }
         storage = new top.mores.backpack.storage.SQLiteStorage(getDataFolder());
-        storage.initialize(dataFile);
+        storage.initialize();
 
         systemDataFile = new File(getDataFolder(), "systemData.yml");
         if (!systemDataFile.exists()) {
