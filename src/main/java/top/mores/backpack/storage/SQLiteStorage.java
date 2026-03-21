@@ -88,17 +88,16 @@ public class SQLiteStorage {
             try (PreparedStatement ps = connection.prepareStatement(sql)) {
                 ps.setString(1, playerUuid.toString());
                 ps.setInt(2, backpackSlot);
-
                 try (ResultSet rs = ps.executeQuery()) {
                     if (rs.next()) {
-                        return parseItemList(rs.getString("items_json"));
+                        String json = rs.getString("items_json");
+                        return parseItemList(json);
                     }
                 }
             }
         } catch (SQLException e) {
             Backpack.getInstance().getLogger().warning(playerUuid + " 读取背包失败: " + e.getMessage());
         }
-
         return new ArrayList<>();
     }
 

@@ -22,13 +22,6 @@ public class SingleBackpack {
     FileUtils fileUtils = new FileUtils();
     PermissionOperation permissionOperation = new PermissionOperation();
 
-    /**
-     * 单个背包物品数组
-     *
-     * @param playerName 玩家ID
-     * @param slot       在主背包中表示的背包槽
-     * @return 物品组
-     */
     public ItemStack[] SingleBackpackItems(UUID playerUuid, int slot) {
         List<Map<String, Object>> itemList = Backpack.getInstance().getStorage().getBackpackItems(playerUuid, slot);
         return ItemStackUtil.getItemStacksFromConfig(itemList);

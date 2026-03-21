@@ -2,6 +2,7 @@ package top.mores.backpack;
 
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.jetbrains.annotations.NotNull;
 import top.mores.backpack.Command.BackpackCommand;
@@ -9,11 +10,13 @@ import top.mores.backpack.Command.BackpackTabCompleter;
 import top.mores.backpack.EventListener.InventoryEventListener;
 import top.mores.backpack.EventListener.PlayerEventListener;
 import top.mores.backpack.GUI.MainGUI;
+import top.mores.backpack.GUI.SingleBackpack;
 import top.mores.backpack.GUI.SkillManager;
 import top.mores.backpack.Utils.ConfigOperation.MessageUtil;
 
 import java.io.File;
 import java.util.Objects;
+import java.util.UUID;
 
 public final class Backpack extends JavaPlugin {
 
@@ -23,6 +26,7 @@ public final class Backpack extends JavaPlugin {
     private File configFile;
     private top.mores.backpack.storage.SQLiteStorage storage;
     private File systemDataFile;
+    private final SingleBackpack singleBackpack=new SingleBackpack();
 
     @Override
     public void onEnable() {
@@ -111,5 +115,9 @@ public final class Backpack extends JavaPlugin {
             }
         }
         reloadSystemData();
+    }
+
+    public ItemStack[] getBackpackPreviewItems(UUID playerUUID,int slot) {
+        return singleBackpack.SingleBackpackItems(playerUUID,slot);
     }
 }
